@@ -1,0 +1,6 @@
+name: CompassPlugin
+version: '${project.version}'
+main: me.corruptionsniper.compass.Main
+api-version: 1.18
+authors: [ CorruptionSniper ]
+description: Snapshot

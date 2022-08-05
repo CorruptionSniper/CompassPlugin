@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 public class Compass implements Listener {
     private Main main;
@@ -17,7 +16,7 @@ public class Compass implements Listener {
     }
 
     private BossBar compassBar;
-
+    private int compassBarUpdaterID;
 
     @EventHandler
     private void onJoin (PlayerJoinEvent event) {
@@ -26,10 +25,14 @@ public class Compass implements Listener {
         compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
         compassBar.addPlayer(player);
 
-        BukkitTask compassBarUpdater = Bukkit.getScheduler().runTaskTimer(main, ()-> {
-            Integer Yaw = (int) player.getLocation().getYaw();
 
+
+        compassBarUpdaterID = Bukkit.getScheduler().runTaskTimer(main, ()-> {
+            if (!Bukkit.getOnlinePlayers().contains(player)) {Bukkit.getScheduler().cancelTask(compassBarUpdaterID);}
+
+            int Yaw = (int) player.getLocation().getYaw();
             String direction;
+
             if (-157.5 < Yaw & Yaw < -112.5) {direction = "NE";}
             else if (-112.5 < Yaw & Yaw < -67.5) {direction = "E";}
             else if (-67.5 < Yaw & Yaw < -22.5) {direction = "SE";}
@@ -41,6 +44,7 @@ public class Compass implements Listener {
 
             player.sendMessage(direction);
             compassBar.setTitle(direction);
-        },40,40);
+        },0,40).getTaskId();
+
     }
 }

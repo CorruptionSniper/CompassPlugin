@@ -15,9 +15,10 @@ public class CompassBar {
     public void Compass(Player player, BossBar compassBar) {
 
         float bearing = player.getLocation().getYaw() + 180;
-        int sectionSize = 90;
+        int screenWidth = 102;
+        int compassScreenCoverage = 1;
         int fov = 95;
-        int length = sectionSize * 360/fov;
+        int length = screenWidth * 360/fov;
 
         for (int i = 0; i < length; i++) {
             compass.add('-');
@@ -35,13 +36,18 @@ public class CompassBar {
 
         for (String compassPoint : compassPoints.keySet()) {
 
-            char compassPointLabel = compassPoint.charAt(0);
-            Integer compassPointBearing = compassPoints.get(compassPoint);
+            String[] splitCompassPoint = compassPoint.split(" ",3);
 
+            Integer compassPointBearing = compassPoints.get(compassPoint);
             int placement =  (compassPointBearing * length)/360;
 
-            compass.remove(placement);
-            compass.add(placement,compassPointLabel);
+            for (String ignored : splitCompassPoint) {
+                compass.remove(placement);
+            }
+            for (int i = splitCompassPoint.length - 1; i >= 0;i--) {
+                compass.add(placement,splitCompassPoint[i].charAt(0));
+            }
+
         }
 
         String stringCompass = "";
@@ -52,7 +58,7 @@ public class CompassBar {
             }
         }
 
-        String compassSection = stringCompass.substring((int) (length + ((bearing - sectionSize/2) * length)/360), (int) (length + ((bearing + sectionSize/2) * length)/360));
+        String compassSection = stringCompass.substring((int) (length + ((bearing - (screenWidth * compassScreenCoverage)/2) * length)/360), (int) (length + ((bearing + (screenWidth * compassScreenCoverage)/2) * length)/360));
 
         System.out.println(compassSection);
         compassBar.setTitle(compassSection);

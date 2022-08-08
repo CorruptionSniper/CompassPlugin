@@ -28,10 +28,10 @@ public class PerPlayerTimer implements Listener {
         compassBarUpdaterID = Bukkit.getScheduler().runTaskTimer(main, ()-> {
             if (!Bukkit.getOnlinePlayers().contains(player)) {Bukkit.getScheduler().cancelTask(compassBarUpdaterID);}
 
-            CompassBar comp = new CompassBar();
-            comp.Compass(player, compassBar);
+            CompassBar compass = new CompassBar();
+            compass.Compass(player, compassBar);
 
-        },0,40).getTaskId();
+        },0,20).getTaskId();
 
     }
 

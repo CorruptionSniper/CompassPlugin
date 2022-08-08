@@ -9,9 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class Compass implements Listener {
+public class PerPlayerTimer implements Listener {
     private Main main;
-    public Compass(Main main) {
+    public PerPlayerTimer(Main main) {
         this.main = main;
     }
 
@@ -25,26 +25,15 @@ public class Compass implements Listener {
         compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
         compassBar.addPlayer(player);
 
-
-
         compassBarUpdaterID = Bukkit.getScheduler().runTaskTimer(main, ()-> {
             if (!Bukkit.getOnlinePlayers().contains(player)) {Bukkit.getScheduler().cancelTask(compassBarUpdaterID);}
 
-            int Yaw = (int) player.getLocation().getYaw();
-            String direction;
+            CompassBar comp = new CompassBar();
+            comp.Compass(player, compassBar);
 
-            if (-157.5 < Yaw & Yaw < -112.5) {direction = "NE";}
-            else if (-112.5 < Yaw & Yaw < -67.5) {direction = "E";}
-            else if (-67.5 < Yaw & Yaw < -22.5) {direction = "SE";}
-            else if (-22.5 < Yaw & Yaw < 22.5) {direction = "S";}
-            else if (22.5 < Yaw & Yaw < 67.5) {direction = "SW";}
-            else if (67.5 < Yaw & Yaw < 112.5) {direction = "W";}
-            else if (112.5 < Yaw & Yaw < 157.5) {direction = "NW";}
-            else {direction = "N";}
-
-            player.sendMessage(direction);
-            compassBar.setTitle(direction);
         },0,40).getTaskId();
 
     }
+
+
 }

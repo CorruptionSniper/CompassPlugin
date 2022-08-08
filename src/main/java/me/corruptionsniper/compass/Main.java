@@ -7,7 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
-        Bukkit.getPluginManager().registerEvents(new Compass(this),this);
+
+        Bukkit.getPluginManager().registerEvents(new PerPlayerTimer(this),this);
 
     }
 }

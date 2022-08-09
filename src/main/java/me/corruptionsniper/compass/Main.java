@@ -8,6 +8,7 @@ public final class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
 
+        //Registers events to PerPlayerTimer class.
         Bukkit.getPluginManager().registerEvents(new PerPlayerTimer(this),this);
 
     }

@@ -15,25 +15,29 @@ public class PerPlayerTimer implements Listener {
         this.main = main;
     }
 
+    //Player BossBar(Compass).
     private BossBar compassBar;
+    //ID for the timer.
     private int compassBarUpdaterID;
 
+    //The method is run when a player joins the server.
     @EventHandler
     private void onJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        //Creation of an instance of a BossBar(Compass) for the player.
         compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
         compassBar.addPlayer(player);
 
+        //Creation of an instance of a timer for the player which runs immediately every second (20 ticks).
         compassBarUpdaterID = Bukkit.getScheduler().runTaskTimer(main, ()-> {
+            //Checks that the player is in the server, and if not terminates the timer.
             if (!Bukkit.getOnlinePlayers().contains(player)) {Bukkit.getScheduler().cancelTask(compassBarUpdaterID);}
 
-            CompassBar compass = new CompassBar();
-            compass.Compass(player, compassBar);
+            //Runs the code which sets up the compass bar.
+            Compass compass = new Compass();
+            compassBar.setTitle(compass.PlayerCompassSection(player));
 
         },0,20).getTaskId();
-
     }
-
-
 }

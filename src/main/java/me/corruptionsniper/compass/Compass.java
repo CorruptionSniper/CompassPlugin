@@ -2,13 +2,14 @@ package me.corruptionsniper.compass;
 
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Compass {
     //A StringBuilder which stores the compass.
     StringBuilder compass = new StringBuilder();
-    //A HashMap which stores the compass points, and their bearing.
-    HashMap<String, Float> compassPoints = new HashMap<>();
+    //A List which stores the compass points, and their bearing.
+    List<CompassPoints> compassPointsList = new ArrayList<>();
 
     //Constant for n of characters which span a screen (with a GUI scale of 3).
     int screenWidth = 102;
@@ -24,15 +25,15 @@ public class Compass {
         //Calculation of the character length of the compass.
         int length = screenWidth * 360/fov;
 
-        //Base compass directions are put inside a hashmap.
-        compassPoints.put("North",0F);
-        compassPoints.put("North East",45F);
-        compassPoints.put("East",90F);
-        compassPoints.put("South East",135F);
-        compassPoints.put("South",180F);
-        compassPoints.put("South West",225F);
-        compassPoints.put("West",270F);
-        compassPoints.put("North West",315F);
+        //Base compass directions are put inside a List.
+        compassPointsList.add(new CompassPoints("North", 0F));
+        compassPointsList.add(new CompassPoints("North East",45F));
+        compassPointsList.add(new CompassPoints("East",90F));
+        compassPointsList.add(new CompassPoints("South East",135F));
+        compassPointsList.add(new CompassPoints("South",180F));
+        compassPointsList.add(new CompassPoints("South West",225F));
+        compassPointsList.add(new CompassPoints("West",270F));
+        compassPointsList.add(new CompassPoints("North West",315F));
 
         //Creates the base for the compass.
         for (int i = 0; i < length; i++) {
@@ -40,23 +41,23 @@ public class Compass {
         }
 
         //Iterates through the HashMap's keys, adding all the compass points to the compass.
-        for (String compassPointLabel : compassPoints.keySet()) {
+        for (CompassPoints compassPoint : compassPointsList) {
 
             //Splits the compass point's label into arguments inside a string list.
-            String[] compassPointLabelArguments = compassPointLabel.split(" ",3);
+            String[] compassPointLabelArguments = compassPoint.label.split(" ",3);
             //Iterates through the arguments of the compass point's label, adding the initial of each argument to a string.
-            String compassPointInitials = "";
+            StringBuilder compassPointInitials = new StringBuilder();
             for (String args : compassPointLabelArguments) {
-                compassPointInitials += args.charAt(0);
+                compassPointInitials.append(args.charAt(0));
             }
 
             //Fetching of the compass point's bearing.
-            float compassPointBearing = compassPoints.get(compassPointLabel);
+            float compassPointBearing = compassPoint.bearing;
             //Calculation of the index where the compass point be placed on the compass.
             int placement = (int) (length * compassPointBearing/360);
 
             //Places the initials of the compass point on the compass.
-            compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials);
+            compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials.toString());
         }
         return compass.toString();
     }
@@ -71,9 +72,9 @@ public class Compass {
         String compass = PlayerCompass(player);
 
         //Writes the compass three times in a string so that in the compass section creation the substring does not go outside the index range.
-        String loopingCompass = "";
+        StringBuilder loopingCompass = new StringBuilder();
         for (int i = 0; i < 3 ;i++) {
-            loopingCompass += compass;
+            loopingCompass.append(compass);
         }
 
         //Creates a substring of the compass by using the index on the string equivalent to the bearing of the player ± half of the screen width, resized by the compass screen coverage to determine the size of the compass on the screen in-game.

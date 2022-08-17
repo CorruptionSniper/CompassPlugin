@@ -8,4 +8,7 @@ public class CompassPoints {
         this.label = label;
         this.bearing = degrees;
     }
+
+    public String getLabel() {return label;}
+    public Float getBearing() {return bearing;}
 }

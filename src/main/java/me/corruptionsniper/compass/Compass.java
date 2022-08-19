@@ -2,13 +2,9 @@ package me.corruptionsniper.compass;
 
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Compass {
-    //A List which stores the compass points, and their bearing.
-    List<CompassPoints> compassPointsList = new ArrayList<>();
-
     //Constant for n of characters which span a screen (with a GUI scale of 3).
     int screenWidth = 102;
     //% size of the compass section (Where at 100% the compass section spans across the whole screen).
@@ -24,15 +20,12 @@ public class Compass {
         //Calculation of the character length of the compass.
         int length = screenWidth * 360/fov;
 
-        //Base compass directions are put inside a List.
-        compassPointsList.add(new CompassPoints("North", 0F));
-        compassPointsList.add(new CompassPoints("North East",45F));
-        compassPointsList.add(new CompassPoints("East",90F));
-        compassPointsList.add(new CompassPoints("South East",135F));
-        compassPointsList.add(new CompassPoints("South",180F));
-        compassPointsList.add(new CompassPoints("South West",225F));
-        compassPointsList.add(new CompassPoints("West",270F));
-        compassPointsList.add(new CompassPoints("North West",315F));
+        PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
+        List<CompassPoints> compassPointsList = pluginPlayerCompassPoints.get(player);
+
+        if (!pluginPlayerCompassPoints.find(player)) {
+            compassPointsList = pluginPlayerCompassPoints.restoreDefaults(player);
+        }
 
         //Creates the base for the compass.
         for (int i = 0; i < length; i++) {

@@ -10,7 +10,6 @@ class Settings {
     public void setSettings(boolean compass) {
         this.compass = compass;
     }
-
     public boolean getCompass() {
         return compass;
     }

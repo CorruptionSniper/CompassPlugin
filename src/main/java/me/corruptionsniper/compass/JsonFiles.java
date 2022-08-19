@@ -1,7 +1,6 @@
 package me.corruptionsniper.compass;
 
 import com.google.gson.Gson;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -26,56 +25,76 @@ public class JsonFiles {
         return file;
     }
 
-    public void setPlayerSettings(Player player, Settings settings) {
-        File file = instanceFile("playerSettings.json");
+    public void writePlayerSettingsFile(PlayerSettings playerSettings) {
+        String fileName = "playerSettings.json";
+        File file = instanceFile(fileName);
 
-        PlayerSettings data = new PlayerSettings();
-        data.put(player.getUniqueId(),settings);
 
         try {
             Gson gson = new Gson();
-            Writer writer = new FileWriter(file,false);
-            gson.toJson(data,writer);
+            Writer writer = new FileWriter(file);
+            gson.toJson(playerSettings,writer);
             writer.flush();
             writer.close();
 
-            System.out.println("written data?");
+            System.out.println("Saved: " + fileName);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Settings getPlayerSettings(Player player) {
-        File file = instanceFile("playerSettings.json");
+    public PlayerSettings readPlayerSettingsFile() {
+        String fileName = "playerSettings.json";
+        File file = instanceFile(fileName);
 
         try {
             Gson gson = new Gson();
             Reader reader = new FileReader(file);
             PlayerSettings fileData = gson.fromJson(reader, PlayerSettings.class);
-            Settings settingsData = fileData.getSettings(player.getUniqueId());
-            if (settingsData == null) {
-                Settings defaultSettings = new Settings(true);
-                setPlayerSettings(player,defaultSettings);
-                return defaultSettings;
-            }
-            else {return settingsData;}
+            if (fileData == null) {fileData = new PlayerSettings();}
 
+            System.out.println("Loaded: " + fileName);
+            return fileData;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /*public CompassPoints getPlayerCompassPoints(Player player) {
+    public void writeCompassPointsFile(PlayerCompassPoints playerCompassPoints) {
+        String fileName = "compassPoints.json";
+        File file = instanceFile(fileName);
+
         try {
             Gson gson = new Gson();
-            Reader reader = new FileReader("compassPointsData.json");
-            CompassPoints compassPointsData = gson.fromJson(reader,CompassPoints.class);
-            return compassPointsData;
+            Writer writer = new FileWriter(file);
+            gson.toJson(playerCompassPoints,writer);
+            writer.flush();
+            writer.close();
+
+            System.out.println("Saved: " + fileName);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }*/
+    }
+
+    public PlayerCompassPoints readCompassPointsFile() {
+        String fileName = "compassPoints.json";
+        File file = instanceFile(fileName);
+
+        try {
+            Gson gson = new Gson();
+            Reader reader = new FileReader(file);
+            PlayerCompassPoints fileData = gson.fromJson(reader, PlayerCompassPoints.class);
+            if (fileData == null) {fileData = new PlayerCompassPoints();}
+
+            System.out.println("Loaded: " + fileName);
+            return fileData;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

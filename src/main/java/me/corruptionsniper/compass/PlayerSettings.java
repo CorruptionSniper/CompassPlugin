@@ -4,15 +4,11 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerSettings {
+    HashMap<UUID,Settings> settingsHashmap = new HashMap<>();
 
-    Settings settings;
-    UUID playerUUID;
-
-    HashMap<UUID,Settings> playerSettings = new HashMap<>();
-
-    public HashMap<UUID, Settings> hashmap() {return playerSettings;}
-
-    public Settings getSettings(UUID playerUUID) {return playerSettings.get(playerUUID);}
-    public void put(UUID playerUUID,Settings settings) {playerSettings.put(playerUUID,settings);}
-    public void remove(UUID playerUUID) {playerSettings.remove(playerUUID);}
+    public Settings get(UUID playerUUID) {return settingsHashmap.get(playerUUID);}
+    public void put(UUID playerUUID,Settings settings) {
+        settingsHashmap.put(playerUUID,settings);}
+    public void remove(UUID playerUUID) {
+        settingsHashmap.remove(playerUUID);}
 }

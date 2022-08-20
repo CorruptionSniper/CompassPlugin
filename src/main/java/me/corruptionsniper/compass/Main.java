@@ -10,8 +10,12 @@ public final class Main extends JavaPlugin implements Listener {
     PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
     @Override
     public void onEnable() {
+        //Loading files to their corresponding classes.
         pluginPlayerSettings.setPlayerSettings(jsonFiles.readPlayerSettingsFile());
         pluginPlayerCompassPoints.setPlayerCompassPoints(jsonFiles.readCompassPointsFile());
+
+        getCommand("settings").setExecutor(new SettingsCommand());
+
         //Registers events to PerPlayerTimer class.
         Bukkit.getPluginManager().registerEvents(new PerPlayerTimer(this),this);
 
@@ -19,6 +23,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        //Saving classes to their corresponding files.
         jsonFiles.writePlayerSettingsFile(pluginPlayerSettings.getPlayerSettings());
         jsonFiles.writeCompassPointsFile(pluginPlayerCompassPoints.getPlayerCompassPoints());
     }

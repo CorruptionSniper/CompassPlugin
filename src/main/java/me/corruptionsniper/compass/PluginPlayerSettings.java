@@ -17,5 +17,11 @@ public class PluginPlayerSettings {
     public void put(Player player, Settings settings) {
         playerSettings.put(player.getUniqueId(),settings);
     }
-
+    public void changeSetting(Player player, String setting, Boolean value) {
+        switch (setting) {
+            case "compass":
+                playerSettings.get(player.getUniqueId()).setCompass(value);
+                break;
+        }
+    }
 }

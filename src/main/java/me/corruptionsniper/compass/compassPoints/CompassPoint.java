@@ -1,10 +1,10 @@
-package me.corruptionsniper.compass;
+package me.corruptionsniper.compass.compassPoints;
 
-public class CompassPoints {
+public class CompassPoint {
     String label;
     Float bearing;
 
-    CompassPoints(String label, Float degrees) {
+    public CompassPoint(String label, Float degrees) {
         this.label = label;
         this.bearing = degrees;
     }

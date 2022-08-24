@@ -1,6 +1,8 @@
 package me.corruptionsniper.compass;
 
 import com.google.gson.Gson;
+import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
+import me.corruptionsniper.compass.settings.PlayerSettings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;

@@ -1,5 +1,6 @@
 package me.corruptionsniper.compass;
 
+import me.corruptionsniper.compass.settings.PluginPlayerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -20,12 +21,6 @@ public class PerPlayerTimer implements Listener {
     @EventHandler
     private void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Settings settings = pluginPlayerSettings.get(player);
-
-        if (settings == null) {
-            settings = new Settings(true);
-            pluginPlayerSettings.put(player,settings);
-        }
         timer(player);
     }
 

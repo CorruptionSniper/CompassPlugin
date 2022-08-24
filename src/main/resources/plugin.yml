@@ -6,3 +6,4 @@ authors: [ CorruptionSniper ]
 description: Snapshot
 commands:
   settings:
+  compassPoints:

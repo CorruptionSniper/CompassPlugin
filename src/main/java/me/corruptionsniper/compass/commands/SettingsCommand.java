@@ -1,5 +1,7 @@
-package me.corruptionsniper.compass;
+package me.corruptionsniper.compass.commands;
 
+import me.corruptionsniper.compass.settings.PluginPlayerSettings;
+import me.corruptionsniper.compass.settings.Settings;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,6 +27,10 @@ public class SettingsCommand implements CommandExecutor {
                 String compass = "compass:";
                 if (settings.getCompass()) {compass += "true";} else {compass += "false";}
                 player.sendMessage("Settings: " + compass);
+
+            } else if (args[0].equals("restoreDefaults")) {
+                pluginPlayerSettings.restoreDefaults(player);
+                player.sendMessage("Settings restored to default settings.");
 
             } else if (args[0].equals("list")) {
                 player.sendMessage("Available Settings: 'compass'.");
@@ -60,33 +66,22 @@ public class SettingsCommand implements CommandExecutor {
                     }
                 } else {formatError.add(arg);}
             }
-
-            if (!settingError.isEmpty()) {
-                StringBuilder errorMessage = new StringBuilder("Invalid Setting:");
-                for (String error : settingError) {
-                    errorMessage.append(" '").append(error).append("',");
-                }
-                errorMessage.append("\nto see a list of possible settings type /settings list.");
-                player.sendMessage(ChatColor.RED + errorMessage.toString());
-            }
-            if (!valueError.isEmpty()) {
-                StringBuilder errorMessage = new StringBuilder("Invalid values:");
-                for (String error : valueError) {
-                    errorMessage.append(" '").append(error).append("',");
-                }
-                errorMessage.append("\nthe only possible values are either 'true' or 'false'.");
-                player.sendMessage(ChatColor.RED + errorMessage.toString());
-            }
-            if (!formatError.isEmpty()) {
-                StringBuilder errorMessage = new StringBuilder("Invalid format:");
-                for (String error : formatError) {
-                    errorMessage.append(" '").append(error).append("',");
-                }
-                errorMessage.append("\nto see the format type /settings format.");
-                player.sendMessage(ChatColor.RED + errorMessage.toString());
-            }
+            checkForError(player,settingError,"Invalid Setting:","to see a list of possible settings type /settings list.");
+            checkForError(player,valueError,"Invalid values:","the only possible values are either 'true' or 'false'.");
+            checkForError(player,formatError,"Invalid format:","to see the format type /settings format.");
 
         }
         return false;
+    }
+
+    private void checkForError(Player player, List<String> errorList, String errorType, String suffixMessage) {
+        if (!errorList.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder(errorType);
+            for (String error : errorList) {
+                errorMessage.append(" '").append(error).append("',");
+            }
+            errorMessage.append("\n").append(suffixMessage);
+            player.sendMessage(ChatColor.RED + errorMessage.toString());
+        }
     }
 }

@@ -1,5 +1,7 @@
 package me.corruptionsniper.compass;
 
+import me.corruptionsniper.compass.compassPoints.CompassPoint;
+import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -21,11 +23,8 @@ public class Compass {
         int length = screenWidth * 360/fov;
 
         PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
-        List<CompassPoints> compassPointsList = pluginPlayerCompassPoints.get(player);
+        List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
 
-        if (!pluginPlayerCompassPoints.find(player)) {
-            compassPointsList = pluginPlayerCompassPoints.restoreDefaults(player);
-        }
 
         //Creates the base for the compass.
         for (int i = 0; i < length; i++) {
@@ -33,7 +32,7 @@ public class Compass {
         }
 
         //Iterates through the HashMap's keys, adding all the compass points to the compass.
-        for (CompassPoints compassPoint : compassPointsList) {
+        for (CompassPoint compassPoint : compassPointList) {
 
             //Splits the compass point's label into arguments inside a string list.
             String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);
@@ -75,6 +74,7 @@ public class Compass {
 
         //-Debug-
         System.out.println(compassSection);
+        System.out.println(compassSection.length());
 
         //Returns the compass section (The portion of the compass which fits the Field Of View of the player).
         return compassSection;

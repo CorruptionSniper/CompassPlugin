@@ -29,7 +29,7 @@ public class PluginPlayerSettings {
     }
 
     public void restoreDefaults(Player player) {
-        Settings defaultSettings = new Settings(true);
+        Settings defaultSettings = new Settings(true,3,70);
         playerSettings.put(player.getUniqueId(),defaultSettings);
     }
 }

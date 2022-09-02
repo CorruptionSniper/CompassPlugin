@@ -29,14 +29,14 @@ public class CompassPointsCommand implements CommandExecutor {
             } else if (args[0].equals("add")) {
                 StringBuilder argsToString = new StringBuilder();
                 for (String arg : args) {
-                    argsToString.append(arg);
+                    argsToString.append(arg).append(" ");
                 }
-                String[] filteredMessage = argsToString.substring(3).split(",",2);
+                String[] filteredMessage = argsToString.substring(4).split(",",2);
                 if (filteredMessage.length == 2) {
-                    String compassPointLabel = filteredMessage[0];
+                    String compassPointLabel = filteredMessage[0].trim();
                     System.out.println("label " + compassPointLabel + "|bearing " + filteredMessage[1]);
                     try {
-                        Float compassPointBearing = Float.parseFloat(filteredMessage[1]);
+                        Float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
                         CompassPoint compassPoint = new CompassPoint(compassPointLabel, compassPointBearing);
                         pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                         player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
@@ -50,9 +50,9 @@ public class CompassPointsCommand implements CommandExecutor {
             } else if (args[0].equals("remove")) {
                 StringBuilder argsToString = new StringBuilder();
                 for (String arg : args) {
-                    argsToString.append(arg);
+                    argsToString.append(arg).append(" ");
                 }
-                String compassPointLabel = argsToString.substring(6);
+                String compassPointLabel = argsToString.substring(7).trim();
                 System.out.println(compassPointLabel);
                 boolean check = false;
                 List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
@@ -61,6 +61,7 @@ public class CompassPointsCommand implements CommandExecutor {
                     if (compassPoint.getLabel().equals(compassPointLabel)) {
                         compassPointToBeRemoved = compassPoint;
                         check = true;
+                        break;
                     }
                 }
                 if (check) {

@@ -1,6 +1,7 @@
 package me.corruptionsniper.compass.compassPoints;
 
 public class CompassPoint {
+
     String label;
     Float bearing;
 

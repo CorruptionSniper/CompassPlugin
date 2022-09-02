@@ -7,8 +7,10 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class Compass {
-    //Constant for n of characters which span a screen (with a GUI scale of 3).
-    int screenWidth = 102;
+    //Constant for n of characters which span a screen (with a GUI scale of 1 and resolution width 1080).
+    int screenWidth = 320;
+    int guiScale = 3;
+
     //% size of the compass section (Where at 100% the compass section spans across the whole screen).
     float compassScreenCoverage = 1;
     //Player in-game Field Of View.
@@ -20,20 +22,20 @@ public class Compass {
         StringBuilder compass = new StringBuilder();
 
         //Calculation of the character length of the compass.
-        int length = screenWidth * 360/fov;
+        int length = (screenWidth * 360)/(guiScale * fov);
+
+        //Creates the base for the compass.
+        for (int i = 0; i < length; i++) {
+            compass.append('-');
+        }
+
+        System.out.println(compass.length());
 
         PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
         List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
 
-
-        //Creates the base for the compass.
-        for (int i = 0; i < length; i++) {
-            compass.append("-");
-        }
-
         //Iterates through the HashMap's keys, adding all the compass points to the compass.
         for (CompassPoint compassPoint : compassPointList) {
-
             //Splits the compass point's label into arguments inside a string list.
             String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);
             //Iterates through the arguments of the compass point's label, adding the initial of each argument to a string.
@@ -60,17 +62,22 @@ public class Compass {
 
         //The compass' length.
         int length = compass.length();
+
         //Conversion of player's yaw into a bearing ranging from 0 to 360.
         float bearing = player.getLocation().getYaw() + 180;
 
         //Writes the compass three times in a string so that in the compass section creation the substring does not go outside the index range.
         StringBuilder loopingCompass = new StringBuilder();
+
         for (int i = 0; i < 3 ;i++) {
             loopingCompass.append(compass);
         }
 
+        float bound = (screenWidth * compassScreenCoverage) / (guiScale * 2);
+        float bearingEquivalentPlacement = length * (1 + bearing/360);
+
         //Creates a substring of the compass by using the index on the string equivalent to the bearing of the player ± half of the screen width, resized by the compass screen coverage to determine the size of the compass on the screen in-game.
-        String compassSection = loopingCompass.substring((int) (length + ((bearing - (screenWidth * compassScreenCoverage)/2) * length)/360), (int) (length + ((bearing + (screenWidth * compassScreenCoverage)/2) * length)/360));
+        String compassSection = loopingCompass.substring((int) (bearingEquivalentPlacement - bound), (int) (bearingEquivalentPlacement + bound));
 
         //-Debug-
         System.out.println(compassSection);

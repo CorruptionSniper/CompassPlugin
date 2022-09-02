@@ -10,6 +10,7 @@ import java.io.*;
 public class JsonFiles {
 
     private JavaPlugin javaPlugin;
+    private Gson gson = new Gson();
     public JsonFiles(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
     }
@@ -34,7 +35,6 @@ public class JsonFiles {
 
 
         try {
-            Gson gson = new Gson();
             Writer writer = new FileWriter(file);
             gson.toJson(playerSettings,writer);
             writer.flush();
@@ -51,7 +51,6 @@ public class JsonFiles {
         File file = instanceFile(playerSettingsFile);
 
         try {
-            Gson gson = new Gson();
             Reader reader = new FileReader(file);
             PlayerSettings fileData = gson.fromJson(reader, PlayerSettings.class);
             if (fileData == null) {fileData = new PlayerSettings();}
@@ -70,7 +69,6 @@ public class JsonFiles {
         File file = instanceFile(compassPointsFileName);
 
         try {
-            Gson gson = new Gson();
             Writer writer = new FileWriter(file);
             gson.toJson(playerCompassPoints,writer);
             writer.flush();
@@ -87,7 +85,6 @@ public class JsonFiles {
         File file = instanceFile(compassPointsFileName);
 
         try {
-            Gson gson = new Gson();
             Reader reader = new FileReader(file);
             PlayerCompassPoints fileData = gson.fromJson(reader, PlayerCompassPoints.class);
             if (fileData == null) {fileData = new PlayerCompassPoints();}

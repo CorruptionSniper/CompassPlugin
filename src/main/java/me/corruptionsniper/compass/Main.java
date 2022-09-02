@@ -5,10 +5,9 @@ import me.corruptionsniper.compass.commands.SettingsCommand;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
 import me.corruptionsniper.compass.settings.PluginPlayerSettings;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Main extends JavaPlugin implements Listener {
+public final class Main extends JavaPlugin {
     JsonFiles jsonFiles = new JsonFiles(this);
     PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
     PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();

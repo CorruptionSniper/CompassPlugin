@@ -2,6 +2,7 @@ package me.corruptionsniper.compass.compassPoints;
 
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PluginPlayerCompassPoints {
@@ -14,21 +15,38 @@ public class PluginPlayerCompassPoints {
         PluginPlayerCompassPoints.playerCompassPoints = playerCompassPoints;
     }
     public List<CompassPoint> get(Player player) {
+        if (!playerCompassPoints.find(player.getUniqueId())) {
+            restoreDefaults(player);
+        }
         return playerCompassPoints.get(player.getUniqueId());
     }
     public void put(Player player, List<CompassPoint> compassPointList) {
         playerCompassPoints.put(player.getUniqueId(), compassPointList);
     }
     public void putCompassPoint(Player player, CompassPoint compassPoint) {
-        playerCompassPoints.putCompassPoint(player.getUniqueId(),compassPoint);
+        List<CompassPoint> compassPointsList = get(player);
+        compassPointsList.add(compassPoint);
+        playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
     public void remove(Player player, CompassPoint compassPoint) {
-        playerCompassPoints.remove(player.getUniqueId(),compassPoint);
+        List<CompassPoint> compassPointList = get(player);
+        compassPointList.remove(compassPoint);
+        playerCompassPoints.put(player.getUniqueId(),compassPointList);
     }
     public boolean find(Player player) {
         return playerCompassPoints.find(player.getUniqueId());
     }
     public void restoreDefaults(Player player) {
-        playerCompassPoints.restoreDefaults(player.getUniqueId());
+        List<CompassPoint> defaultCompassPoints = new ArrayList<>();
+        defaultCompassPoints.add(new CompassPoint("North", 0F));
+        defaultCompassPoints.add(new CompassPoint("North East",45F));
+        defaultCompassPoints.add(new CompassPoint("East",90F));
+        defaultCompassPoints.add(new CompassPoint("South East",135F));
+        defaultCompassPoints.add(new CompassPoint("South",180F));
+        defaultCompassPoints.add(new CompassPoint("South West",225F));
+        defaultCompassPoints.add(new CompassPoint("West",270F));
+        defaultCompassPoints.add(new CompassPoint("North West",315F));
+
+        playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints);
     }
 }

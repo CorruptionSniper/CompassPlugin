@@ -32,9 +32,6 @@ public class SettingsCommand implements CommandExecutor {
                 pluginPlayerSettings.restoreDefaults(player);
                 player.sendMessage("Settings restored to default settings.");
 
-            } else if (args[0].equals("list")) {
-                player.sendMessage("Available Settings: 'compass'.");
-
             } else if (args[0].equals("format")) {
                 player.sendMessage("Argument format: <Setting>:<Boolean Value>");
 

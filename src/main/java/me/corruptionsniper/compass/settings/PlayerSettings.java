@@ -12,7 +12,4 @@ public class PlayerSettings {
     public void put(UUID playerUUID,Settings settings) {
         playerSettingsHashmap.put(playerUUID,settings);
     }
-    public void remove(UUID playerUUID) {
-        playerSettingsHashmap.remove(playerUUID);
-    }
 }

@@ -23,7 +23,6 @@ public class PerPlayerTimer implements Listener {
         Player player = event.getPlayer();
         timer(player);
     }
-
     private int timerID;
 
     private void timer(Player player) {
@@ -39,12 +38,12 @@ public class PerPlayerTimer implements Listener {
 
             boolean compassSetting = pluginPlayerSettings.get(player).getCompass();
             boolean compassBarPlayerStatus = compassBar.getPlayers().contains(player);
+
             if (compassSetting) {
-                //Runs the code which sets up the compass bar.
-                compassBar.setTitle(new Compass().PlayerCompassSection(player));
                 if (!compassBarPlayerStatus) {
                     compassBar.addPlayer(player);
                 }
+                compassBar.setTitle(new Compass().PlayerCompassSection(player));
             } else if (compassBarPlayerStatus) {
                 compassBar.removePlayer(player);
             }

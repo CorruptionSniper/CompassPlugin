@@ -12,11 +12,12 @@ public class PluginPlayerCompassPoints {
         return playerCompassPoints;
     }
     public void setPlayerCompassPoints(PlayerCompassPoints playerCompassPoints) {
-        PluginPlayerCompassPoints.playerCompassPoints = playerCompassPoints;
+        if (playerCompassPoints != null) {PluginPlayerCompassPoints.playerCompassPoints = playerCompassPoints;}
+        else {PluginPlayerCompassPoints.playerCompassPoints = new PlayerCompassPoints();}
     }
     public List<CompassPoint> get(Player player) {
         if (!playerCompassPoints.find(player.getUniqueId())) {
-            restoreDefaults(player);
+            playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints());
         }
         return playerCompassPoints.get(player.getUniqueId());
     }
@@ -36,7 +37,7 @@ public class PluginPlayerCompassPoints {
     public boolean find(Player player) {
         return playerCompassPoints.find(player.getUniqueId());
     }
-    public void restoreDefaults(Player player) {
+    public List<CompassPoint> defaultCompassPoints() {
         List<CompassPoint> defaultCompassPoints = new ArrayList<>();
         defaultCompassPoints.add(new CompassPoint("North", 0F));
         defaultCompassPoints.add(new CompassPoint("North East",45F));
@@ -46,7 +47,6 @@ public class PluginPlayerCompassPoints {
         defaultCompassPoints.add(new CompassPoint("South West",225F));
         defaultCompassPoints.add(new CompassPoint("West",270F));
         defaultCompassPoints.add(new CompassPoint("North West",315F));
-
-        playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints);
+        return defaultCompassPoints;
     }
 }

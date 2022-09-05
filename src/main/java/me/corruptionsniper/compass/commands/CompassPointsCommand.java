@@ -70,7 +70,7 @@ public class CompassPointsCommand implements CommandExecutor {
                 } else {player.sendMessage(ChatColor.RED + "Compass Point not found.");}
 
             } else if (args[0].equals("restoreDefaults")) {
-                pluginPlayerCompassPoints.restoreDefaults(player);
+                pluginPlayerCompassPoints.put(player,pluginPlayerCompassPoints.defaultCompassPoints());
                 player.sendMessage("Compass Points restored to defaults.");
 
             } else {player.sendMessage(ChatColor.RED + "Command does not exist");}

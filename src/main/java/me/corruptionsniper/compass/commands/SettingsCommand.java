@@ -10,8 +10,10 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SettingsCommand implements CommandExecutor {
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
@@ -22,51 +24,97 @@ public class SettingsCommand implements CommandExecutor {
             List<String> valueError = new ArrayList<>();
             List<String> formatError = new ArrayList<>();
 
-            if (args.length == 0) {
-                Settings settings = pluginPlayerSettings.get(player);
-                String compass = "compass:";
-                if (settings.getCompass()) {compass += "true";} else {compass += "false";}
-                player.sendMessage("Settings: " + compass);
+            Settings settings = pluginPlayerSettings.get(player);
 
-            } else if (args[0].equals("restoreDefaults")) {
+            if (args.length == 0) {
+                String compass = "Compass:";
+                if (settings.getCompass()) {compass += "true\n";} else {compass += "false\n";}
+                String guiScale = "GUI Scale: " + settings.getGuiScale() + "\n";
+                String fov = "FOV: " + settings.getFov() + "\n";
+                String screenCoverage = "Compass Screen Coverage: " + settings.getScreenCoverage() + "\n";
+                String resolution = "Resolution: " + settings.getWidth() + "x" + settings.getHeight() + "\n";
+                player.sendMessage("Settings:\n" + compass + guiScale + fov + screenCoverage + resolution);
+
+            } else if (args[0].equalsIgnoreCase("restoreDefaults")) {
                 pluginPlayerSettings.restoreDefaults(player);
                 player.sendMessage("Settings restored to default settings.");
 
-            } else if (args[0].equals("format")) {
-                player.sendMessage("Argument format: <Setting>:<Boolean Value>");
-
+            } else if (args[0].equalsIgnoreCase("format")) {
+                player.sendMessage("Argument format: <Setting>:<Boolean Value>\nSettings: compass, guiScale,");
             } else for (String arg : args) {
-                String[] splitArg = arg.split(":",2);
+                String[] splitArg = arg.toLowerCase(Locale.ROOT).split(":", 2);
 
                 if (splitArg.length == 2) {
-                    String setting = null;
                     switch (splitArg[0]) {
                         case "compass":
-                            setting = "compass";
+                        case "compassToggle":
+                            if (splitArg[1].equals("true")) {
+                                settings.setCompass(true);
+                            } else if (splitArg[1].equals("false")) {
+                                settings.setCompass(false);
+                            } else {
+                                valueError.add(splitArg[1]);
+                            }
                             break;
-                    }
-
-                    Boolean value = null;
-                    switch (splitArg[1]) {
-                        case "true":
-                            value = true;
+                        case "guiScale":
+                        case "gui":
+                            try {
+                                int intValueOfArg = Integer.parseInt(splitArg[1]);
+                                if (intValueOfArg < 1) {
+                                    valueError.add(splitArg[1]);
+                                } else {settings.setGuiScale(intValueOfArg);}
+                            } catch (NumberFormatException e) {
+                                valueError.add(splitArg[1]);
+                            }
                             break;
-                        case "false":
-                            value = false;
+                        case "fov":
+                            try {
+                                int intValueOfArg = Integer.parseInt(splitArg[1]);
+                                if (intValueOfArg < 30 | intValueOfArg > 110) {
+                                    valueError.add(splitArg[1]);
+                                } else {settings.setFov(intValueOfArg);}
+                            } catch (NumberFormatException e) {
+                                valueError.add(splitArg[1]);
+                            }
                             break;
-                    }
-
-                    if (setting == null) {settingError.add(splitArg[0]);}
-                    if (value == null) {valueError.add(splitArg[1]);}
-                    if (setting != null && value != null) {
-                        pluginPlayerSettings.changeSetting(player,setting,value);
+                        case "screenCoverage":
+                        case "compassWidth":
+                            try {
+                                float floatValueOfArg = Float.parseFloat(splitArg[1]);
+                                if (floatValueOfArg < 0 | floatValueOfArg > 1) {
+                                    valueError.add(splitArg[1]);
+                                } else {settings.setScreenCoverage(floatValueOfArg);}
+                            } catch (NumberFormatException e) {
+                                valueError.add(splitArg[1]);
+                            }
+                            break;
+                        case "dimensions":
+                        case "resolution":
+                            String[] dimensions = splitArg[1].split("x",2);
+                            if (dimensions.length != 2) {
+                                valueError.add(splitArg[1]);
+                            } else {
+                                try{
+                                    int height = Integer.parseInt(dimensions[1]);
+                                    int width = Integer.parseInt(dimensions[0]);
+                                    if (height < 0 | width < 0) {
+                                        valueError.add(splitArg[1]);
+                                    } else {settings.setHeight(height); settings.setWidth(width);}
+                                } catch (NumberFormatException e) {
+                                    valueError.add(splitArg[1]);
+                                }
+                            }
+                            break;
+                        default:
+                            settingError.add(splitArg[0]);
                     }
                 } else {formatError.add(arg);}
             }
-            checkForError(player,settingError,"Invalid Setting:","to see a list of possible settings type /settings list.");
-            checkForError(player,valueError,"Invalid values:","the only possible values are either 'true' or 'false'.");
-            checkForError(player,formatError,"Invalid format:","to see the format type /settings format.");
+            pluginPlayerSettings.put(player, settings);
 
+            checkForError(player, settingError, "Invalid Settings:", "to see a list of possible settings type /settings format.");
+            checkForError(player, valueError, "Invalid values:", "to see a list of values allowed for each setting type /settings format.");
+            checkForError(player, formatError, "Invalid format:", "to see the format type /settings format.");
         }
         return false;
     }

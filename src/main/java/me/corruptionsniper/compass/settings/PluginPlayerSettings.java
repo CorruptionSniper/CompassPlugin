@@ -9,8 +9,10 @@ public class PluginPlayerSettings {
         return playerSettings;
     }
     public void setPlayerSettings(PlayerSettings playerSettings) {
-        PluginPlayerSettings.playerSettings = playerSettings;
+        if (playerSettings != null) {PluginPlayerSettings.playerSettings = playerSettings;}
+        else {PluginPlayerSettings.playerSettings = new PlayerSettings();}
     }
+
     public Settings get(Player player) {
         if (playerSettings.get(player.getUniqueId()) == null) {
             restoreDefaults(player);
@@ -20,16 +22,12 @@ public class PluginPlayerSettings {
     public void put(Player player, Settings settings) {
         playerSettings.put(player.getUniqueId(),settings);
     }
-    public void changeSetting(Player player, String setting, Boolean value) {
-        switch (setting) {
-            case "compass":
-                playerSettings.get(player.getUniqueId()).setCompass(value);
-                break;
-        }
-    }
+
 
     public void restoreDefaults(Player player) {
-        Settings defaultSettings = new Settings(true,3,70);
+        Settings defaultSettings = new Settings(true,3,70,1,1920,1080);
         playerSettings.put(player.getUniqueId(),defaultSettings);
     }
+
+
 }

@@ -43,7 +43,7 @@ public class PerPlayerTimer implements Listener {
                 if (!compassBarPlayerStatus) {
                     compassBar.addPlayer(player);
                 }
-                compassBar.setTitle(new Compass().PlayerCompassSection(player));
+                compassBar.setTitle(new Compass().newCompass(player));
             } else if (compassBarPlayerStatus) {
                 compassBar.removePlayer(player);
             }

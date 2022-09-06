@@ -33,7 +33,6 @@ public class Compass {
         } else {
             trueFov = fov;
         }
-
         int length = ((int) (width * compassScreenCoverage)/(characterPixelWidth * guiScale) );
 
         StringBuilder compass = new StringBuilder();

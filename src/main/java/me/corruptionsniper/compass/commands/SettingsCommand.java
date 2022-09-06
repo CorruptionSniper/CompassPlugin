@@ -46,8 +46,7 @@ public class SettingsCommand implements CommandExecutor {
 
                 if (splitArg.length == 2) {
                     switch (splitArg[0]) {
-                        case "compass":
-                        case "compassToggle":
+                        case "compasstoggle":
                             if (splitArg[1].equals("true")) {
                                 settings.setCompass(true);
                             } else if (splitArg[1].equals("false")) {
@@ -56,8 +55,7 @@ public class SettingsCommand implements CommandExecutor {
                                 valueError.add(splitArg[1]);
                             }
                             break;
-                        case "guiScale":
-                        case "gui":
+                        case "guiscale":
                             try {
                                 int intValueOfArg = Integer.parseInt(splitArg[1]);
                                 if (intValueOfArg < 1) {
@@ -77,8 +75,7 @@ public class SettingsCommand implements CommandExecutor {
                                 valueError.add(splitArg[1]);
                             }
                             break;
-                        case "screenCoverage":
-                        case "compassWidth":
+                        case "screencoverage":
                             try {
                                 float floatValueOfArg = Float.parseFloat(splitArg[1]);
                                 if (floatValueOfArg < 0 | floatValueOfArg > 1) {
@@ -89,7 +86,6 @@ public class SettingsCommand implements CommandExecutor {
                             }
                             break;
                         case "dimensions":
-                        case "resolution":
                             String[] dimensions = splitArg[1].split("x",2);
                             if (dimensions.length != 2) {
                                 valueError.add(splitArg[1]);

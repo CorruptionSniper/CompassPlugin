@@ -7,6 +7,7 @@ Current Implemented Feature:
 - Settings Command to toggle and adjust CompassPlugin features.
 - CompassPoints Command to add, remove and view compass points.
   -Different types of compass points: directions and coordinates.
+  -Added option to add custom colours to compass points.
 - TabCompleters for all commands to facilitate typing commands.
 - Permanent saving of settings to a Json File.
 - Permanent saving of compass points to a Json File.

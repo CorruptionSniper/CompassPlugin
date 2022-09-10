@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CompassPointsCommand implements CommandExecutor {
 
@@ -28,13 +29,14 @@ public class CompassPointsCommand implements CommandExecutor {
 
             } else if (args[0].equalsIgnoreCase("add")) {
                 if (args.length > 2) {
-                    String[] filteredMessage = argsToString(args).substring(args[0].length() + args[1].length() + 2).split(",",3);
+                    String[] filteredMessage = argsToString(args).substring(args[0].length() + args[1].length() + 2).split(",",4);
                     String compassPointLabel = filteredMessage[0].trim();
                     if (args[1].equalsIgnoreCase("direction")) {
-                        if (filteredMessage.length == 2) {
+                        if (filteredMessage.length == 3) {
                             try {
                                 float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
-                                CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null);
+                                CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null, null);
+                                compassPoint.setColour(filteredMessage[2].toLowerCase(Locale.ROOT).trim());
                                 pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                                 player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
                             } catch (NumberFormatException e) {
@@ -44,11 +46,12 @@ public class CompassPointsCommand implements CommandExecutor {
                             }
                         } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>'.");}
                     }  else if (args[1].equalsIgnoreCase("coordinate")) {
-                        if (filteredMessage.length == 3) {
+                        if (filteredMessage.length == 4) {
                             try {
                                 float xCoordinate = Float.parseFloat(filteredMessage[1].trim());
                                 float zCoordinate = Float.parseFloat(filteredMessage[2].trim());
-                                CompassPoint compassPoint = new CompassPoint("coordinate", compassPointLabel, null, xCoordinate, zCoordinate);
+                                CompassPoint compassPoint = new CompassPoint("coordinate", compassPointLabel, null, xCoordinate, zCoordinate, null);
+                                compassPoint.setColour(filteredMessage[3].toLowerCase(Locale.ROOT).trim());
                                 pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                                 player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
                             } catch (NumberFormatException e) {
@@ -65,7 +68,7 @@ public class CompassPointsCommand implements CommandExecutor {
                 System.out.println(compassPointLabel);
                 boolean check = false;
                 List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
-                CompassPoint compassPointToBeRemoved = new CompassPoint(null, null, null, null, null);
+                CompassPoint compassPointToBeRemoved = new CompassPoint(null, null, null, null, null, null);
                 for (CompassPoint compassPoint : compassPointList) {
                     if (compassPoint.getLabel().equals(compassPointLabel)) {
                         compassPointToBeRemoved = compassPoint;

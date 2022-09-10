@@ -4,10 +4,10 @@ import me.corruptionsniper.compass.compassPoints.CompassPoint;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
 import me.corruptionsniper.compass.settings.PluginPlayerSettings;
 import me.corruptionsniper.compass.settings.Settings;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Compass {
 
@@ -16,7 +16,8 @@ public class Compass {
 
     //The constant for the number of characters which span a screen with a GUI scale of 1.
     int characterPixelWidth = 6;
-
+    char compassBaseSymbol = '-';
+    ChatColor compassBaseColour = ChatColor.GRAY;
 
     public String newCompass(Player player) {
         Settings settings = pluginPlayerSettings.get(player);
@@ -38,15 +39,20 @@ public class Compass {
         }
         int length = ((int) (width * compassScreenCoverage)/(characterPixelWidth * guiScale) );
 
+        Map<Integer,ChatColor> chatColorPlacementMap = new TreeMap<>(Collections.reverseOrder());
+
+        chatColorPlacementMap.put(0, compassBaseColour);
         StringBuilder compass = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            compass.append('-');
+            compass.append(compassBaseSymbol);
         }
 
         for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
             Float compassPointBearing = compassPoint.getBearing();
-            if (compassPoint.getType().equalsIgnoreCase("coordinate")) {
+            if (!compassPoint.getType().equalsIgnoreCase("direction")) {
+                if (compassPoint.getType().equalsIgnoreCase("coordinate")) {
                 compassPointBearing = (float) (Math.atan2( compassPoint.getXCoordinate() - player.getLocation().getX(), player.getLocation().getZ() - compassPoint.getZCoordinate()) * (360/(3.14159F * 2)));
+                } else {continue;}
             }
 
 
@@ -69,16 +75,24 @@ public class Compass {
 
             //Placing of compass point on compass
             compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials.toString());
+
+            chatColorPlacementMap.put(placement, compassPoint.getColour());
+            chatColorPlacementMap.put(placement + compassPointLabelArguments.length, compassBaseColour);
         }
+
+        for (Map.Entry<Integer, ChatColor> entry : chatColorPlacementMap.entrySet()) {
+            compass.insert(entry.getKey(), entry.getValue());
+        }
+
         return compass.toString();
     }
 
     private float PolynomialFunction(float x, List<Float> coefficients) {
-        float xValue = 1;
+        float xPowerValue = 1;
         float total = 0;
         for (float coefficient : coefficients) {
-            total += coefficient * xValue;
-            xValue *= x;
+            total += coefficient * xPowerValue;
+            xPowerValue *= x;
         }
         return total;
     }

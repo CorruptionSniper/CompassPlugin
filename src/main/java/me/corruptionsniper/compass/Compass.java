@@ -6,6 +6,9 @@ import me.corruptionsniper.compass.settings.PluginPlayerSettings;
 import me.corruptionsniper.compass.settings.Settings;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Compass {
 
     PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
@@ -22,14 +25,14 @@ public class Compass {
         int width = settings.getWidth();
         int height = settings.getHeight();
         float compassScreenCoverage = settings.getScreenCoverage();
-        float bearing = player.getLocation().getYaw() + 180;
+        float playerBearing = player.getLocation().getYaw() + 180;
 
         float aspectRatio = ((float) height)/((float) width);
         float trueFov;
         if (aspectRatio == 0.5625) {
-            trueFov = (-0.0052F * fov * fov) + (1.81F * fov) + 1.18F;
+            trueFov = PolynomialFunction(fov, Arrays.asList(1.18F, 1.81F, -0.0052F));
         } else if (aspectRatio == 0.75) {
-            trueFov = (-0.0026F * fov * fov) + (1.43F * fov) - 1.25F;
+            trueFov = PolynomialFunction(fov, Arrays.asList(1.25F, 1.43F, -0.0026F));
         } else {
             trueFov = fov;
         }
@@ -41,20 +44,46 @@ public class Compass {
         }
 
         for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
-            float compassPointBearing = compassPoint.getBearing();
-            if (compassPointBearing < (bearing + trueFov/2F) & compassPointBearing > (bearing - trueFov/2F)) {
-                String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);
-
-                StringBuilder compassPointInitials = new StringBuilder();
-                for (String args : compassPointLabelArguments) {
-                    compassPointInitials.append(args.charAt(0));
-                }
-
-                int placement = (int) ((length * ((compassPointBearing)-(bearing - trueFov/2F)))/(trueFov));
-
-                compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials.toString());
+            Float compassPointBearing = compassPoint.getBearing();
+            if (compassPoint.getType().equalsIgnoreCase("coordinate")) {
+                compassPointBearing = (float) (Math.atan2( compassPoint.getXCoordinate() - player.getLocation().getX(), player.getLocation().getZ() - compassPoint.getZCoordinate()) * (360/(3.14159F * 2)));
             }
+
+
+            float difference = Modulus(compassPointBearing - playerBearing, 360);
+            if (!(difference < trueFov / 2)) {
+                if (difference > (360 - (trueFov / 2))) {
+                    difference -= 360;
+                } else {continue;}
+            }
+
+            //Placement of the compass point on compass.
+            int placement = (int) (length * (((difference / trueFov) + 0.5F) % 1));
+
+            //Name of the compass point on compass.
+            String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);
+            StringBuilder compassPointInitials = new StringBuilder();
+            for (String args : compassPointLabelArguments) {
+                compassPointInitials.append(args.charAt(0));
+            }
+
+            //Placing of compass point on compass
+            compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials.toString());
         }
         return compass.toString();
+    }
+
+    private float PolynomialFunction(float x, List<Float> coefficients) {
+        float xValue = 1;
+        float total = 0;
+        for (float coefficient : coefficients) {
+            total += coefficient * xValue;
+            xValue *= x;
+        }
+        return total;
+    }
+
+    private  float Modulus(float a, float b) {
+        return (float) (a - (Math.floor(a/b) * b));
     }
 }

@@ -26,37 +26,46 @@ public class CompassPointsCommand implements CommandExecutor {
                 }
                 player.sendMessage("Compass Points:" + compassPointsMessageList);
 
-            } else if (args[0].equals("add")) {
-                StringBuilder argsToString = new StringBuilder();
-                for (String arg : args) {
-                    argsToString.append(arg).append(" ");
-                }
-                String[] filteredMessage = argsToString.substring(4).split(",",2);
-                if (filteredMessage.length == 2) {
+            } else if (args[0].equalsIgnoreCase("add")) {
+                if (args.length > 2) {
+                    String[] filteredMessage = argsToString(args).substring(args[0].length() + args[1].length() + 2).split(",",3);
                     String compassPointLabel = filteredMessage[0].trim();
-                    System.out.println("label " + compassPointLabel + "|bearing " + filteredMessage[1]);
-                    try {
-                        Float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
-                        CompassPoint compassPoint = new CompassPoint(compassPointLabel, compassPointBearing);
-                        pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
-                        player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
-                    } catch (NumberFormatException e) {
-                        player.sendMessage(ChatColor.RED + "Invalid Syntax: The bearing must be a number.");
-                    } catch (NullPointerException e) {
-                        player.sendMessage(ChatColor.RED + "Invalid Syntax: Bearing not provided.");
-                    }
-                } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add <label>,<bearing>'");}
+                    if (args[1].equalsIgnoreCase("direction")) {
+                        if (filteredMessage.length == 2) {
+                            try {
+                                float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
+                                CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null);
+                                pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
+                                player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The bearing must be a number.");
+                            } catch (NullPointerException e) {
+                                player.sendMessage(ChatColor.RED + "Invalid Syntax: Compass point bearing not provided.");
+                            }
+                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>'.");}
+                    }  else if (args[1].equalsIgnoreCase("coordinate")) {
+                        if (filteredMessage.length == 3) {
+                            try {
+                                float xCoordinate = Float.parseFloat(filteredMessage[1].trim());
+                                float zCoordinate = Float.parseFloat(filteredMessage[2].trim());
+                                CompassPoint compassPoint = new CompassPoint("coordinate", compassPointLabel, null, xCoordinate, zCoordinate);
+                                pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
+                                player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The coordinates must be numbers.");
+                            } catch (NullPointerException e) {
+                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The coordinates have not been provided.");
+                            }
+                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>'.");}
+                    }  else {player.sendMessage(ChatColor.RED + "Invalid syntax: Provided compass point type does not exist.");}
+                } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>' or '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>'.");}
 
             } else if (args[0].equals("remove")) {
-                StringBuilder argsToString = new StringBuilder();
-                for (String arg : args) {
-                    argsToString.append(arg).append(" ");
-                }
-                String compassPointLabel = argsToString.substring(7).trim();
+                String compassPointLabel = argsToString(args).substring(7).trim();
                 System.out.println(compassPointLabel);
                 boolean check = false;
                 List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
-                CompassPoint compassPointToBeRemoved = new CompassPoint(null,null);
+                CompassPoint compassPointToBeRemoved = new CompassPoint(null, null, null, null, null);
                 for (CompassPoint compassPoint : compassPointList) {
                     if (compassPoint.getLabel().equals(compassPointLabel)) {
                         compassPointToBeRemoved = compassPoint;
@@ -77,5 +86,13 @@ public class CompassPointsCommand implements CommandExecutor {
         }
 
         return false;
+    }
+
+    private String argsToString(String[] args) {
+        StringBuilder argsToString = new StringBuilder();
+        for (String arg : args) {
+            argsToString.append(arg).append(" ");
+        }
+        return argsToString.toString();
     }
 }

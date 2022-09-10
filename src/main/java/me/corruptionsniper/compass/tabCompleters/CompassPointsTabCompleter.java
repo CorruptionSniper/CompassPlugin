@@ -1,4 +1,4 @@
-package me.corruptionsniper.compass;
+package me.corruptionsniper.compass.tabCompleters;
 
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
@@ -24,14 +24,18 @@ public class CompassPointsTabCompleter implements TabCompleter {
             if (args.length == 1) {
                 options.add("add");
                 options.add("remove");
-                return copyPartialMatches(args,options);
+            } else if (args[0].equalsIgnoreCase("add")) {
+                if (args.length == 2) {
+                    options.add("direction");
+                    options.add("coordinate");
+                }
             } else if (args[0].equalsIgnoreCase("remove")) {
                 PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
                 for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
                     options.add(compassPoint.getLabel());
                 }
-                return copyPartialMatches(args,options);
             }
+            return copyPartialMatches(args,options);
         }
         return null;
     }

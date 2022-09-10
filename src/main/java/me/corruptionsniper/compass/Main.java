@@ -6,6 +6,7 @@ import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
 import me.corruptionsniper.compass.settings.PlayerSettings;
 import me.corruptionsniper.compass.settings.PluginPlayerSettings;
+import me.corruptionsniper.compass.tabCompleters.CompassPointsTabCompleter;
 import me.corruptionsniper.compass.tabCompleters.SettingsTabCompleter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;

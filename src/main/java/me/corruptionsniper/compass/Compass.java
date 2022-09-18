@@ -29,6 +29,8 @@ public class Compass {
         float playerBearing = player.getLocation().getYaw() + 180;
 
         float aspectRatio = ((float) height)/((float) width);
+
+        //()
         float trueFov;
         if (aspectRatio == 0.5625) {
             trueFov = PolynomialFunction(fov, Arrays.asList(1.18F, 1.81F, -0.0052F));
@@ -39,23 +41,34 @@ public class Compass {
         }
         int length = ((int) (width * compassScreenCoverage)/(characterPixelWidth * guiScale) );
 
+        /*
+        Creating a map that stores the position and colour that has to be later inserted into the compass.
+        This is done due to the fact that adding a ChatColour to a string shifts the string index at any point forward
+        of it messing up the compass point placement, and therefore as to be added at a later time in reverse order
+        which explains the use of a treemap that sorts in reverse order.
+        */
         Map<Integer,ChatColor> chatColorPlacementMap = new TreeMap<>(Collections.reverseOrder());
 
+        //Creation of the compass base.
         chatColorPlacementMap.put(0, compassBaseColour);
         StringBuilder compass = new StringBuilder();
         for (int i = 0; i < length; i++) {
             compass.append(compassBaseSymbol);
         }
 
+        //Iterates through compass points to check if compass point is to be placed onto the compass, and if so, places it onto the compass.
         for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
+
             Float compassPointBearing = compassPoint.getBearing();
+
+            //
             if (!compassPoint.getType().equalsIgnoreCase("direction")) {
                 if (compassPoint.getType().equalsIgnoreCase("coordinate")) {
                 compassPointBearing = (float) (Math.atan2( compassPoint.getXCoordinate() - player.getLocation().getX(), player.getLocation().getZ() - compassPoint.getZCoordinate()) * (360/(3.14159F * 2)));
                 } else {continue;}
             }
 
-
+            //Checking if compass point is in the field of view of the player.
             float difference = Modulus(compassPointBearing - playerBearing, 360);
             if (!(difference < trueFov / 2)) {
                 if (difference > (360 - (trueFov / 2))) {
@@ -63,8 +76,9 @@ public class Compass {
                 } else {continue;}
             }
 
-            //Placement of the compass point on compass.
-            int placement = (int) (length * (((difference / trueFov) + 0.5F) % 1));
+            //Placement of the compass point on compass. (The use of a cubic is to account for Minecraft FOV scaling, which stretches the screen)
+            float spread = 0.5F;
+            int placement = (int) (length * (0.5F * PolynomialFunction((2 * difference)/trueFov, Arrays.asList(0F, 1 - spread, 0F, spread)) + 0.5F));
 
             //Name of the compass point on compass.
             String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);
@@ -76,10 +90,12 @@ public class Compass {
             //Placing of compass point on compass
             compass.replace(placement,placement + compassPointLabelArguments.length, compassPointInitials.toString());
 
+            //Adding colour and placement of compass point onto map.
             chatColorPlacementMap.put(placement, compassPoint.getColour());
             chatColorPlacementMap.put(placement + compassPointLabelArguments.length, compassBaseColour);
         }
 
+        //Adding ChatColour to compass.
         for (Map.Entry<Integer, ChatColor> entry : chatColorPlacementMap.entrySet()) {
             compass.insert(entry.getKey(), entry.getValue());
         }
@@ -97,7 +113,7 @@ public class Compass {
         return total;
     }
 
-    private  float Modulus(float a, float b) {
+    private float Modulus(float a, float b) {
         return (float) (a - (Math.floor(a/b) * b));
     }
 }

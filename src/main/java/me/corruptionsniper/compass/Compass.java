@@ -61,7 +61,7 @@ public class Compass {
 
             Float compassPointBearing = compassPoint.getBearing();
 
-            //
+            //Checks the type of compass point.
             if (!compassPoint.getType().equalsIgnoreCase("direction")) {
                 if (compassPoint.getType().equalsIgnoreCase("coordinate")) {
                 compassPointBearing = (float) (Math.atan2( compassPoint.getXCoordinate() - player.getLocation().getX(), player.getLocation().getZ() - compassPoint.getZCoordinate()) * (360/(3.14159F * 2)));

@@ -23,7 +23,7 @@ public class CompassPointsCommand implements CommandExecutor {
                 List<CompassPoint> compassPoints = pluginPlayerCompassPoints.get(player);
                 StringBuilder compassPointsMessageList = new StringBuilder();
                 for (CompassPoint compassPoint: compassPoints) {
-                    compassPointsMessageList.append("\n").append(compassPoint.getLabel()).append(", ").append(compassPoint.getBearing());
+                    compassPointsMessageList.append("\n").append(compassPoint.getLabel()).append(", ").append(compassPoint.getColour()).append(compassPoint.getBearing());
                 }
                 player.sendMessage("Compass Points:" + compassPointsMessageList);
 
@@ -32,11 +32,12 @@ public class CompassPointsCommand implements CommandExecutor {
                     String[] filteredMessage = argsToString(args).substring(args[0].length() + args[1].length() + 2).split(",",4);
                     String compassPointLabel = filteredMessage[0].trim();
                     if (args[1].equalsIgnoreCase("direction")) {
-                        if (filteredMessage.length == 3) {
+                        if (filteredMessage.length == 2 | filteredMessage.length == 3) {
                             try {
                                 float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
                                 CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null, null);
-                                compassPoint.setColour(filteredMessage[2].toLowerCase(Locale.ROOT).trim());
+                                if (filteredMessage.length == 3) {compassPoint.setColour(null);}
+                                else {compassPoint.setColour(filteredMessage[2].toLowerCase(Locale.ROOT).trim());}
                                 pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                                 player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
                             } catch (NumberFormatException e) {
@@ -44,14 +45,15 @@ public class CompassPointsCommand implements CommandExecutor {
                             } catch (NullPointerException e) {
                                 player.sendMessage(ChatColor.RED + "Invalid Syntax: Compass point bearing not provided.");
                             }
-                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>'.");}
+                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>,'<colour>''.");}
                     }  else if (args[1].equalsIgnoreCase("coordinate")) {
-                        if (filteredMessage.length == 4) {
+                        if (filteredMessage.length == 3 | filteredMessage.length == 4) {
                             try {
                                 float xCoordinate = Float.parseFloat(filteredMessage[1].trim());
                                 float zCoordinate = Float.parseFloat(filteredMessage[2].trim());
                                 CompassPoint compassPoint = new CompassPoint("coordinate", compassPointLabel, null, xCoordinate, zCoordinate, null);
-                                compassPoint.setColour(filteredMessage[3].toLowerCase(Locale.ROOT).trim());
+                                if (filteredMessage.length == 3) {compassPoint.setColour(null);}
+                                else {compassPoint.setColour(filteredMessage[3].toLowerCase(Locale.ROOT).trim());}
                                 pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                                 player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
                             } catch (NumberFormatException e) {
@@ -59,9 +61,9 @@ public class CompassPointsCommand implements CommandExecutor {
                             } catch (NullPointerException e) {
                                 player.sendMessage(ChatColor.RED + "Invalid Syntax: The coordinates have not been provided.");
                             }
-                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>'.");}
+                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>,<colour>'.");}
                     }  else {player.sendMessage(ChatColor.RED + "Invalid syntax: Provided compass point type does not exist.");}
-                } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>' or '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>'.");}
+                } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>,<colour>' or '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>,<colour>'.");}
 
             } else if (args[0].equals("remove")) {
                 String compassPointLabel = argsToString(args).substring(7).trim();

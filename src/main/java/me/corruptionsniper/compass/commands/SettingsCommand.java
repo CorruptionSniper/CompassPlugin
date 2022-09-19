@@ -29,10 +29,10 @@ public class SettingsCommand implements CommandExecutor {
             if (args.length == 0) {
                 String compass = "Compass:";
                 if (settings.getCompass()) {compass += "true\n";} else {compass += "false\n";}
-                String guiScale = "GUI Scale: " + settings.getGuiScale() + "\n";
-                String fov = "FOV: " + settings.getFov() + "\n";
-                String screenCoverage = "Compass Screen Coverage: " + settings.getScreenCoverage() + "\n";
-                String resolution = "Resolution: " + settings.getWidth() + "x" + settings.getHeight() + "\n";
+                String guiScale = "guiScale: " + settings.getGuiScale() + "\n";
+                String fov = "fov: " + settings.getFov() + "\n";
+                String screenCoverage = "screenCoverage: " + settings.getScreenCoverage() + "\n";
+                String resolution = "resolution: " + settings.getWidth() + "x" + settings.getHeight() + "\n";
                 player.sendMessage("Settings:\n" + compass + guiScale + fov + screenCoverage + resolution);
 
             } else if (args[0].equalsIgnoreCase("restoreDefaults")) {
@@ -40,7 +40,35 @@ public class SettingsCommand implements CommandExecutor {
                 player.sendMessage("Settings restored to default settings.");
 
             } else if (args[0].equalsIgnoreCase("format")) {
-                player.sendMessage("Argument format: <Setting>:<Boolean Value>\nSettings: compass, guiScale,");
+                player.sendMessage(" Command format: '/settings <argument 1> <argument 2> ... <argument 3>'\nArgument format: <Setting>:<Value>\nAvailable settings: compassToggle, guiScale, fov, screenCoverage, dimensions\ntype '/settings info' for more detailed information for each setting");
+            } else if (args[0].equalsIgnoreCase("info")) {
+                StringBuilder informationMessage = new StringBuilder();
+                String compassToggleInformation = "\n- CompassToggle\n  value: boolean (eg. true, false).\n  Toggles on/off the compass.";
+                String guiScaleInformation = "\n- GuiScale\n  value: integer number\n  Resizes the compass to match the GUI scale of the player.";
+                String fovInformation = "\n- FOV\n  value: integer number between 30 and 110\n  Changes the scaling of compass points to match the fov of the player.";
+                String screenCoverageInformation = "\n- ScreenCoverage\n  value: number between 0 and 1 (eg. 1, 0.8, 0.9)\n  Adjusts the amount of the screen covered by the compass.";
+                String resolutionInformation = "\n- Resolution\n  value: <width>x<height> (eg. 1920x1080, 1024x768)\n  Resizes the compass and scaling of compass points to match the screen of the player.\n  Warning: ";
+                String tip = "\nto specify which setting to look at type '/info <setting>'";
+                if (args.length != 1) {
+                    for (String arg : args) {
+                        switch (arg) {
+                            case "compassToggle":
+                                informationMessage.append(compassToggleInformation);
+                                break;
+                            case "guiScale":
+                                informationMessage.append(guiScaleInformation);
+                                break;
+                            case "screenCoverage:":
+                                informationMessage.append(screenCoverageInformation);
+                                break;
+                            case "resolution":
+                                informationMessage.append(resolutionInformation);
+                                break;
+                        }
+                    }
+                } else {informationMessage.append(compassToggleInformation).append(guiScaleInformation).append(fovInformation).append(screenCoverageInformation).append(resolutionInformation).append(tip);}
+                player.sendMessage("Setting information:" + informationMessage);
+
             } else for (String arg : args) {
                 String[] splitArg = arg.toLowerCase(Locale.ROOT).split(":", 2);
 

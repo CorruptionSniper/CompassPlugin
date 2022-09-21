@@ -34,9 +34,9 @@ public class CompassPointsCommand implements CommandExecutor {
                     if (args[1].equalsIgnoreCase("direction")) {
                         if (filteredMessage.length == 2 | filteredMessage.length == 3) {
                             try {
-                                float compassPointBearing = Float.parseFloat(filteredMessage[1].trim());
+                                float compassPointBearing = Math.floorMod((int) Float.parseFloat(filteredMessage[1].trim()), 360);
                                 CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null, null);
-                                if (filteredMessage.length == 3) {compassPoint.setColour(null);}
+                                if (filteredMessage.length == 2) {compassPoint.setColour(null);}
                                 else {compassPoint.setColour(filteredMessage[2].toLowerCase(Locale.ROOT).trim());}
                                 pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
                                 player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");

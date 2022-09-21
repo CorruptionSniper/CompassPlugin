@@ -9,45 +9,57 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class PerPlayerTimer implements Listener {
-    private Main main;
+    private final Main main;
     public PerPlayerTimer(Main main) {
         this.main = main;
     }
     PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
 
-    //The method is run when a player joins the server.
+    private static HashMap<UUID, Integer> cleanupMap = new HashMap<>();
+
     @EventHandler
     private void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        timer(player);
+        //Starting of an instance of a timer for the player.
+        timer(event.getPlayer());
     }
-    private int timerID;
+
+    @EventHandler
+    private void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        //Deletion of the player's timer instance.
+        Bukkit.getScheduler().cancelTask(cleanupMap.get(player.getUniqueId()));
+        //Removing of the player from the hashmap.
+        cleanupMap.remove(player.getUniqueId());
+    }
+
+    int period = 20;
 
     private void timer(Player player) {
-        //Player BossBar(Compass).
-        BossBar compassBar;
         //Creation of an instance of a BossBar(The Compass) for the player.
-        compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
+        BossBar compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
 
-        //Creation of an instance of a timer for the player which runs immediately every second (20 ticks).
-        timerID = Bukkit.getScheduler().runTaskTimer(main, ()-> {
-            //Checks that the player is in the server, and if not terminates the timer.
-            if (!Bukkit.getOnlinePlayers().contains(player)) {Bukkit.getScheduler().cancelTask(timerID);}
-
+        //Creation of an instance of a timer for the player,
+        //Whilst its task ID is stored into a hashmap with the player's UUID.
+        //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
+        cleanupMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, ()-> {
             boolean compassSetting = pluginPlayerSettings.get(player).getCompass();
-            boolean compassBarPlayerStatus = compassBar.getPlayers().contains(player);
+            boolean compassBarContainsPlayer = compassBar.getPlayers().contains(player);
 
             if (compassSetting) {
-                if (!compassBarPlayerStatus) {
+                if (!compassBarContainsPlayer) {
                     compassBar.addPlayer(player);
                 }
-                compassBar.setTitle(new Compass().newCompass(player));
-            } else if (compassBarPlayerStatus) {
+                compassBar.setTitle(new Compass().compassGenerator(player));
+            } else if (compassBarContainsPlayer) {
                 compassBar.removePlayer(player);
             }
 
-        },0,20).getTaskId();
+        },0,period).getTaskId());
     }
 }

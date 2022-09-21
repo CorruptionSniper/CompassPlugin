@@ -34,7 +34,8 @@ public class CompassPointsTabCompleter implements TabCompleter {
                 } else if (args[1].equalsIgnoreCase("direction")){
                     switch (stringArgs.length) {
                         case 2:
-                            options.add(String.valueOf((int) player.getLocation().getYaw()));
+                            options.add(String.valueOf((int) player.getLocation().getYaw() + 180));
+                            break;
                         case 3:
                             options = colourList;
                             break;

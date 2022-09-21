@@ -8,8 +8,8 @@ import java.lang.reflect.Type;
 
 public class JsonFiles {
 
-    private Gson gson = new Gson();
-    private JavaPlugin javaPlugin;
+    private final Gson gson = new Gson();
+    private final JavaPlugin javaPlugin;
     public JsonFiles(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
     }

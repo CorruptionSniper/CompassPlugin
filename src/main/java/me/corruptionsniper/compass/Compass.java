@@ -14,15 +14,15 @@ public class Compass {
     PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
     PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
 
-    //The constant for the number of characters which span a screen with a GUI scale of 1.
+    //The pixel width of a character (with a GUI scale of 1).
     int characterPixelWidth = 6;
     char compassBaseSymbol = '-';
     ChatColor compassBaseColour = ChatColor.GRAY;
 
-    public String newCompass(Player player) {
+    public String compassGenerator(Player player) {
         Settings settings = pluginPlayerSettings.get(player);
         int guiScale = settings.getGuiScale();
-        int fov = settings.getFov();
+        float fov = settings.getFov();
         int width = settings.getWidth();
         int height = settings.getHeight();
         float compassScreenCoverage = settings.getScreenCoverage();
@@ -30,21 +30,19 @@ public class Compass {
 
         float aspectRatio = ((float) height)/((float) width);
 
-        //()
-        float trueFov;
+        //The in-game fov gets altered by the aspect ratio of the user's screen.
+        //The equations below model how the fov gets altered at an aspect ratio of 16:9 and 4:3, no other aspect ratios are currently supported.
         if (aspectRatio == 0.5625) {
-            trueFov = PolynomialFunction(fov, Arrays.asList(1.18F, 1.81F, -0.0052F));
+            fov = PolynomialFunction(fov, Arrays.asList(1.18F, 1.81F, -0.0052F));
         } else if (aspectRatio == 0.75) {
-            trueFov = PolynomialFunction(fov, Arrays.asList(1.25F, 1.43F, -0.0026F));
-        } else {
-            trueFov = fov;
+            fov = PolynomialFunction(fov, Arrays.asList(1.25F, 1.43F, -0.0026F));
         }
         int length = ((int) (width * compassScreenCoverage)/(characterPixelWidth * guiScale) );
 
         /*
         Creating a map that stores the position and colour that has to be later inserted into the compass.
         This is done due to the fact that adding a ChatColour to a string shifts the string index at any point forward
-        of it messing up the compass point placement, and therefore as to be added at a later time in reverse order
+        of it messing up the compass point placement, and therefore it has to be added at a later time in reverse order
         which explains the use of a treemap that sorts in reverse order.
         */
         Map<Integer,ChatColor> chatColorPlacementMap = new TreeMap<>(Collections.reverseOrder());
@@ -70,15 +68,15 @@ public class Compass {
 
             //Checking if compass point is in the field of view of the player.
             float difference = Modulus(compassPointBearing - playerBearing, 360);
-            if (!(difference < trueFov / 2)) {
-                if (difference > (360 - (trueFov / 2))) {
+            if (!(difference < fov / 2)) {
+                if (difference > (360 - (fov / 2))) {
                     difference -= 360;
                 } else {continue;}
             }
 
             //Placement of the compass point on compass. (The use of a cubic is to account for Minecraft FOV scaling, which stretches the screen)
             float spread = 0.5F;
-            int placement = (int) (length * (0.5F * PolynomialFunction((2 * difference)/trueFov, Arrays.asList(0F, 1 - spread, 0F, spread)) + 0.5F));
+            int placement = (int) (length * (0.5F * PolynomialFunction((2 * difference)/fov, Arrays.asList(0F, 1 - spread, 0F, spread)) + 0.5F));
 
             //Name of the compass point on compass.
             String[] compassPointLabelArguments = compassPoint.getLabel().split(" ",3);

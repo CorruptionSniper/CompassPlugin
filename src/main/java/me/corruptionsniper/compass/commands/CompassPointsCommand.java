@@ -1,5 +1,6 @@
 package me.corruptionsniper.compass.commands;
 
+import me.corruptionsniper.compass.CommandUtil;
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
 import org.bukkit.ChatColor;
@@ -8,96 +9,127 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 public class CompassPointsCommand implements CommandExecutor {
+    PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
+    CommandUtil commandUtil = new CommandUtil();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String l, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
+
+            ChatColor titleColour = ChatColor.LIGHT_PURPLE;
+            ChatColor headingColour = ChatColor.YELLOW;
+            ChatColor subHeadingColour = ChatColor.AQUA;
 
             if (args.length == 0) {
                 List<CompassPoint> compassPoints = pluginPlayerCompassPoints.get(player);
                 StringBuilder compassPointsMessageList = new StringBuilder();
                 for (CompassPoint compassPoint: compassPoints) {
-                    compassPointsMessageList.append("\n").append(compassPoint.getLabel()).append(", ").append(compassPoint.getColour()).append(compassPoint.getBearing());
-                }
-                player.sendMessage("Compass Points:" + compassPointsMessageList);
-
-            } else if (args[0].equalsIgnoreCase("add")) {
-                if (args.length > 2) {
-                    String[] filteredMessage = argsToString(args).substring(args[0].length() + args[1].length() + 2).split(",",4);
-                    String compassPointLabel = filteredMessage[0].trim();
-                    if (args[1].equalsIgnoreCase("direction")) {
-                        if (filteredMessage.length == 2 | filteredMessage.length == 3) {
-                            try {
-                                float compassPointBearing = Math.floorMod((int) Float.parseFloat(filteredMessage[1].trim()), 360);
-                                CompassPoint compassPoint = new CompassPoint("direction", compassPointLabel, compassPointBearing, null, null, null);
-                                if (filteredMessage.length == 2) {compassPoint.setColour(null);}
-                                else {compassPoint.setColour(filteredMessage[2].toLowerCase(Locale.ROOT).trim());}
-                                pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
-                                player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
-                            } catch (NumberFormatException e) {
-                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The bearing must be a number.");
-                            } catch (NullPointerException e) {
-                                player.sendMessage(ChatColor.RED + "Invalid Syntax: Compass point bearing not provided.");
-                            }
-                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>,'<colour>''.");}
-                    }  else if (args[1].equalsIgnoreCase("coordinate")) {
-                        if (filteredMessage.length == 3 | filteredMessage.length == 4) {
-                            try {
-                                float xCoordinate = Float.parseFloat(filteredMessage[1].trim());
-                                float zCoordinate = Float.parseFloat(filteredMessage[2].trim());
-                                CompassPoint compassPoint = new CompassPoint("coordinate", compassPointLabel, null, xCoordinate, zCoordinate, null);
-                                if (filteredMessage.length == 3) {compassPoint.setColour(null);}
-                                else {compassPoint.setColour(filteredMessage[3].toLowerCase(Locale.ROOT).trim());}
-                                pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
-                                player.sendMessage("Compass Point '" + compassPointLabel + "' was added to your compass.");
-                            } catch (NumberFormatException e) {
-                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The coordinates must be numbers.");
-                            } catch (NullPointerException e) {
-                                player.sendMessage(ChatColor.RED + "Invalid Syntax: The coordinates have not been provided.");
-                            }
-                        } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>,<colour>'.");}
-                    }  else {player.sendMessage(ChatColor.RED + "Invalid syntax: Provided compass point type does not exist.");}
-                } else {player.sendMessage(ChatColor.RED + "Invalid format: The format must be in the form '/compassPoints add direction <label>,<bearing>,<colour>' or '/compassPoints add coordinates <label>,<x coordinate>,<z coordinate>,<colour>'.");}
-
-            } else if (args[0].equals("remove")) {
-                String compassPointLabel = argsToString(args).substring(7).trim();
-                System.out.println(compassPointLabel);
-                boolean check = false;
-                List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
-                CompassPoint compassPointToBeRemoved = new CompassPoint(null, null, null, null, null, null);
-                for (CompassPoint compassPoint : compassPointList) {
-                    if (compassPoint.getLabel().equals(compassPointLabel)) {
-                        compassPointToBeRemoved = compassPoint;
-                        check = true;
-                        break;
+                    String properties = "";
+                    switch (compassPoint.getType()) {
+                        case "direction":
+                            properties = commandUtil.setColour("bearing: ",subHeadingColour) + compassPoint.getBearing().toString();
+                            break;
+                        case "coordinate":
+                            properties =  commandUtil.setColour("x: ",subHeadingColour) + compassPoint.getXCoordinate() + commandUtil.setColour(", z: ",subHeadingColour) + compassPoint.getZCoordinate();
+                            break;
                     }
+                    compassPointsMessageList.append("\n").append(compassPoint.getColour()).append(compassPoint.getLabel()).append(ChatColor.WHITE).append(" - ").append(properties);
                 }
-                if (check) {
-                    pluginPlayerCompassPoints.remove(player,compassPointToBeRemoved);
-                    player.sendMessage("Compass Point '" + compassPointLabel + "' was removed.");
-                } else {player.sendMessage(ChatColor.RED + "Compass Point not found.");}
+                player.sendMessage(commandUtil.setColour("Compass Points:", titleColour) + compassPointsMessageList);
+            } else switch (args[0].toLowerCase(Locale.ROOT)) {
+                case "restoredefaults":
+                    pluginPlayerCompassPoints.put(player,pluginPlayerCompassPoints.defaultCompassPoints());
+                    player.sendMessage(ChatColor.GREEN + "Compass points have been restored to defaults.");
+                    break;
+                case "format":
+                    player.sendMessage(commandUtil.setColour("Compass Points Add Format: ", headingColour) + "'/compasspoints add <compasspoint 1>; <compasspoint 2>; ... <compasspoint n>'\n" + commandUtil.setColour("Argument format:", headingColour) + "\n<name>,<type>,<properties>\n\n" + commandUtil.setColour("Properties format:", headingColour) + commandUtil.setColour("\nif <type> is equal to direction: ",subHeadingColour) + "bearing, colour(optional)" +  commandUtil.setColour("\nif <type> is equal to coordinate: ",subHeadingColour) +"x coordinate, z coordinate, colour(optional)");
+                    break;
+                case "add":
+                    List<String> typeErrorList = new ArrayList<>();
+                    List<String> numberFormatErrorList = new ArrayList<>();
+                    List<String> formatErrorList = new ArrayList<>();
 
-            } else if (args[0].equals("restoreDefaults")) {
-                pluginPlayerCompassPoints.put(player,pluginPlayerCompassPoints.defaultCompassPoints());
-                player.sendMessage("Compass Points restored to defaults.");
+                    List<String> compassPointsAdded = new ArrayList<>();
+                    String[] compassPointsToAdd = commandUtil.join(Arrays.asList(args), " ").substring(4).split(";");
 
-            } else {player.sendMessage(ChatColor.RED + "Command does not exist");}
+                    for (String compassPointToAdd : compassPointsToAdd) {
+                        String[] compassPointProperties = compassPointToAdd.split(",");
+                        String type = compassPointProperties[1].trim().toLowerCase(Locale.ROOT);
+                        String label = compassPointProperties[0].trim();
+                        Float degrees = null;
+                        Float xCoordinate = null;
+                        Float zCoordinate = null;
+                        String colour = compassPointProperties[compassPointProperties.length - 1];
+                        if (label.isEmpty()) {continue;}
+                        try {
+                            switch (type) {
+                                case "direction":
+                                    degrees = (float) Math.floorMod(Integer.parseInt(compassPointProperties[2].trim()), 360);
+                                    break;
+                                case "coordinate":
+                                    xCoordinate = (float) Integer.parseInt(compassPointProperties[2].trim());
+                                    zCoordinate = (float) Integer.parseInt(compassPointProperties[3].trim());
+                                    break;
+                                default:
+                                    typeErrorList.add(label);
+                                    continue;
+                            }
+                        } catch (NumberFormatException e) {
+                            numberFormatErrorList.add(label);
+                            continue;
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            formatErrorList.add(label);
+                            continue;
+                        }
+                        CompassPoint compassPoint = new CompassPoint(type,label,degrees,xCoordinate,zCoordinate,null);
+                        compassPoint.setColour(colour);
+
+                        pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
+                        compassPointsAdded.add(label);
+                    }
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid format for:", formatErrorList,"type '/compassPoints format' to view the correct format.");
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid number format for:", numberFormatErrorList,"the number inputted was invalid for these compass points.");
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid compass type for:", typeErrorList,"the only available compass types are 'direction' and 'coordinate'");
+
+                    commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:", compassPointsAdded, "have been added to your compass");
+                    break;
+                case "remove":
+                    List<String> compassPointNotFoundError = new ArrayList<>();
+                    List<String> compassPointsRemoved = new ArrayList<>();
+
+                    String[] compassPointsToRemove = commandUtil.join(Arrays.asList(args), " ").substring(7).split(";");
+                    for (String compassPointToRemove : compassPointsToRemove) {
+                        String label = compassPointToRemove.trim();
+                        List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
+                        CompassPoint compassPointToBeRemoved = null;
+                        for (CompassPoint compassPoint: compassPointList) {
+                            if (compassPoint.getLabel().equals(label)) {
+                                compassPointToBeRemoved = compassPoint;
+                                break;
+                            }
+                        }
+
+                        if (compassPointToBeRemoved != null) {
+                            pluginPlayerCompassPoints.remove(player,compassPointToBeRemoved);
+                            compassPointsRemoved.add(label);
+                        } else {
+                            compassPointNotFoundError.add(label);}
+                    }
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointNotFoundError,"make sure you have types these in correctly.");
+                    commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:",compassPointsRemoved,"have been successfully removed.");
+                    break;
+                default:
+                    player.sendMessage(ChatColor.RED + "The command does not exist");
+            }
         }
 
         return false;
-    }
-
-    private String argsToString(String[] args) {
-        StringBuilder argsToString = new StringBuilder();
-        for (String arg : args) {
-            argsToString.append(arg).append(" ");
-        }
-        return argsToString.toString();
     }
 }

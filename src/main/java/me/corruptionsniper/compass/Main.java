@@ -2,9 +2,7 @@ package me.corruptionsniper.compass;
 
 import me.corruptionsniper.compass.commands.CompassPointsCommand;
 import me.corruptionsniper.compass.commands.SettingsCommand;
-import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
-import me.corruptionsniper.compass.settings.PlayerSettings;
 import me.corruptionsniper.compass.settings.PluginPlayerSettings;
 import me.corruptionsniper.compass.tabCompleters.CompassPointsTabCompleter;
 import me.corruptionsniper.compass.tabCompleters.SettingsTabCompleter;
@@ -22,8 +20,9 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         //Loading files to their corresponding classes.
-        pluginPlayerSettings.setPlayerSettings(jsonFiles.read(playerSettingsFileName, PlayerSettings.class));
-        pluginPlayerCompassPoints.setPlayerCompassPoints((jsonFiles.read(compassPointsFileName, PlayerCompassPoints.class)));
+        //pluginPlayerSettings.setPlayerSettings(jsonFiles.read(playerSettingsFileName, PlayerSettings.class));
+        jsonFiles.read(compassPointsFileName, PluginPlayerCompassPoints.class);
+        jsonFiles.read(playerSettingsFileName, PluginPlayerSettings.class);
 
         getCommand("settings").setExecutor(new SettingsCommand());
         getCommand("compassPoints").setExecutor(new CompassPointsCommand());

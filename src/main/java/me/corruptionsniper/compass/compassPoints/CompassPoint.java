@@ -43,9 +43,12 @@ public class CompassPoint {
     public ChatColor getColour() {
         return colour;
     }
-    public void setColour(String string) {colour = stringToChatColour(string);}
+    public void setColour(String string) {
+        this.colour = stringToChatColour(string);
+    }
 
     private ChatColor stringToChatColour(String string) {
+        System.out.println("'" + string + "'");
         switch (string) {
             case "black":
                 return ChatColor.BLACK;

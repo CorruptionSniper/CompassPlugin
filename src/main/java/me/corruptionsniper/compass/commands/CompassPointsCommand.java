@@ -40,7 +40,7 @@ public class CompassPointsCommand implements CommandExecutor {
                             properties =  commandUtil.setColour("x: ",subHeadingColour) + compassPoint.getXCoordinate() + commandUtil.setColour(", z: ",subHeadingColour) + compassPoint.getZCoordinate();
                             break;
                     }
-                    compassPointsMessageList.append("\n").append(compassPoint.getColour()).append(compassPoint.getLabel()).append(ChatColor.WHITE).append(" - ").append(properties);
+                    compassPointsMessageList.append("\n").append(compassPoint.getColour()).append(compassPoint.getLabel()).append(headingColour).append(" - ").append(properties);
                 }
                 player.sendMessage(commandUtil.setColour("Compass Points:", titleColour) + compassPointsMessageList);
             } else switch (args[0].toLowerCase(Locale.ROOT)) {
@@ -57,16 +57,18 @@ public class CompassPointsCommand implements CommandExecutor {
                     List<String> formatErrorList = new ArrayList<>();
 
                     List<String> compassPointsAdded = new ArrayList<>();
+
                     String[] compassPointsToAdd = commandUtil.join(Arrays.asList(args), " ").substring(4).split(";");
 
                     for (String compassPointToAdd : compassPointsToAdd) {
                         String[] compassPointProperties = compassPointToAdd.split(",");
+                        if (compassPointProperties.length < 2) {continue;}
                         String type = compassPointProperties[1].trim().toLowerCase(Locale.ROOT);
                         String label = compassPointProperties[0].trim();
                         Float degrees = null;
                         Float xCoordinate = null;
                         Float zCoordinate = null;
-                        String colour = compassPointProperties[compassPointProperties.length - 1];
+                        String colour = compassPointProperties[compassPointProperties.length - 1].trim().toLowerCase(Locale.ROOT);
                         if (label.isEmpty()) {continue;}
                         try {
                             switch (type) {
@@ -108,7 +110,7 @@ public class CompassPointsCommand implements CommandExecutor {
                     for (String compassPointToRemove : compassPointsToRemove) {
                         String label = compassPointToRemove.trim();
                         List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
-                        CompassPoint compassPointToBeRemoved = null;
+                        CompassPoint compassPointToBeRemoved = new CompassPoint(null,null,null,null,null,null);
                         for (CompassPoint compassPoint: compassPointList) {
                             if (compassPoint.getLabel().equals(label)) {
                                 compassPointToBeRemoved = compassPoint;
@@ -116,11 +118,11 @@ public class CompassPointsCommand implements CommandExecutor {
                             }
                         }
 
-                        if (compassPointToBeRemoved != null) {
-                            pluginPlayerCompassPoints.remove(player,compassPointToBeRemoved);
+                        if (pluginPlayerCompassPoints.remove(player,compassPointToBeRemoved)) {
                             compassPointsRemoved.add(label);
                         } else {
-                            compassPointNotFoundError.add(label);}
+                            compassPointNotFoundError.add(label);
+                        }
                     }
                     commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointNotFoundError,"make sure you have types these in correctly.");
                     commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:",compassPointsRemoved,"have been successfully removed.");

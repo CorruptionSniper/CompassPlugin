@@ -4,22 +4,24 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class PluginPlayerCompassPoints {
-    private static PlayerCompassPoints playerCompassPoints;
+    private static HashMap<UUID, List<CompassPoint>> playerCompassPoints = new HashMap<>();
 
-    public PlayerCompassPoints getPlayerCompassPoints() {
+    public HashMap<UUID, List<CompassPoint>> getPlayerCompassPoints() {
         return playerCompassPoints;
     }
 
-    public void setPlayerCompassPoints(PlayerCompassPoints playerCompassPoints) {
+    public void setPlayerCompassPoints(HashMap<UUID, List<CompassPoint>> playerCompassPoints) {
         if (playerCompassPoints != null) {PluginPlayerCompassPoints.playerCompassPoints = playerCompassPoints;}
-        else {PluginPlayerCompassPoints.playerCompassPoints = new PlayerCompassPoints();}
+        else {PluginPlayerCompassPoints.playerCompassPoints = new HashMap<>();}
     }
 
     public List<CompassPoint> get(Player player) {
-        if (!playerCompassPoints.find(player.getUniqueId())) {
+        if (!playerCompassPoints.containsKey(player.getUniqueId())) {
             playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints());
         }
         return playerCompassPoints.get(player.getUniqueId());
@@ -35,14 +37,8 @@ public class PluginPlayerCompassPoints {
         playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
 
-    public void remove(Player player, CompassPoint compassPoint) {
-        List<CompassPoint> compassPointList = get(player);
-        compassPointList.remove(compassPoint);
-        playerCompassPoints.put(player.getUniqueId(),compassPointList);
-    }
-
-    public boolean find(Player player) {
-        return playerCompassPoints.find(player.getUniqueId());
+    public boolean remove(Player player, CompassPoint compassPoint) {
+        return playerCompassPoints.get(player.getUniqueId()).remove(compassPoint);
     }
 
     public List<CompassPoint> defaultCompassPoints() {

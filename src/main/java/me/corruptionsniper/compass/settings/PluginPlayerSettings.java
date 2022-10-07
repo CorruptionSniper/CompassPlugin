@@ -2,15 +2,14 @@ package me.corruptionsniper.compass.settings;
 
 import org.bukkit.entity.Player;
 
-public class PluginPlayerSettings {
-    private static PlayerSettings playerSettings;
+import java.util.HashMap;
+import java.util.UUID;
 
-    public PlayerSettings getPlayerSettings() {
+public class PluginPlayerSettings {
+    private static HashMap<UUID, Settings> playerSettings = new HashMap<>();
+
+    public HashMap<UUID, Settings> getPlayerSettings() {
         return playerSettings;
-    }
-    public void setPlayerSettings(PlayerSettings playerSettings) {
-        if (playerSettings != null) {PluginPlayerSettings.playerSettings = playerSettings;}
-        else {PluginPlayerSettings.playerSettings = new PlayerSettings();}
     }
 
     public Settings get(Player player) {

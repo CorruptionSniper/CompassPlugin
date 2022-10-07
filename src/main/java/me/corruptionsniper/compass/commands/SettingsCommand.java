@@ -180,13 +180,12 @@ public class SettingsCommand implements CommandExecutor {
                             formatError.add(arg);
                         }
                         pluginPlayerSettings.put(player, settings);
-
-                        commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid Settings:", settingError, "to see a list of possible settings type /settings format.");
-                        commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid values:", valueError, "to see a list of values allowed for each setting type /settings format.");
-                        commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid format:", formatError, "to see the format type /settings format.");
-
-                        commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Settings:", changedSettings, "have been successfully changed.");
                     }
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid Settings:", settingError, "to see a list of possible settings type /settings format.");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid values:", valueError, "to see a list of values allowed for each setting type /settings format.");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid format:", formatError, "to see the format type /settings format.");
+
+                    commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Settings:", changedSettings, "have been successfully changed.");
                     break;
             }
         }

@@ -1,9 +1,9 @@
 name: CompassPlugin
-version: '${project.version}'
+version: '1.0'
 main: me.corruptionsniper.compass.Main
 api-version: 1.18
 authors: [ CorruptionSniper ]
-description: Snapshot
+description: A plugin which provides a compass on the BossBar.
 commands:
   settings:
   compassPoints:

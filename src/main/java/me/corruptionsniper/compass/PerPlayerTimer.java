@@ -1,6 +1,6 @@
 package me.corruptionsniper.compass;
 
-import me.corruptionsniper.compass.settings.PluginPlayerSettings;
+import me.corruptionsniper.compass.settings.PlayerSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -19,7 +19,7 @@ public class PerPlayerTimer implements Listener {
     public PerPlayerTimer(Main main) {
         this.main = main;
     }
-    PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
+    PlayerSettings playerSettings = new PlayerSettings();
 
     private static HashMap<UUID, Integer> cleanupMap = new HashMap<>();
 
@@ -48,7 +48,7 @@ public class PerPlayerTimer implements Listener {
         //Whilst its task ID is stored into a hashmap with the player's UUID.
         //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
         cleanupMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, ()-> {
-            boolean compassSetting = pluginPlayerSettings.get(player).getCompass();
+            boolean compassSetting = playerSettings.get(player).getCompass();
             boolean compassBarContainsPlayer = compassBar.getPlayers().contains(player);
 
             if (compassSetting) {

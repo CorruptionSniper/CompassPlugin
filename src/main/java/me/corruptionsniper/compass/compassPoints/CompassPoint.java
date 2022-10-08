@@ -2,7 +2,7 @@ package me.corruptionsniper.compass.compassPoints;
 
 import org.bukkit.ChatColor;
 
-public class CompassPoint {
+public class CompassPoint implements Comparable<CompassPoint>{
 
     String type;
     String label;
@@ -48,7 +48,6 @@ public class CompassPoint {
     }
 
     private ChatColor stringToChatColour(String string) {
-        System.out.println("'" + string + "'");
         switch (string) {
             case "black":
                 return ChatColor.BLACK;
@@ -85,4 +84,20 @@ public class CompassPoint {
         }
     }
 
+    @Override
+    public int compareTo(CompassPoint anotherCompassPoint) {
+        return label.compareTo(anotherCompassPoint.getLabel());
+    }
+
+    @Override
+    public boolean equals(Object anotherObject){
+        if (this == anotherObject) {
+            return true;
+        }
+        if (anotherObject instanceof CompassPoint) {
+            CompassPoint anotherCompassPoint = (CompassPoint) anotherObject;
+            return label.equals(anotherCompassPoint.getLabel());
+        }
+        return false;
+    }
 }

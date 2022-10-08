@@ -1,7 +1,7 @@
 package me.corruptionsniper.compass.commands;
 
 import me.corruptionsniper.compass.CommandUtil;
-import me.corruptionsniper.compass.settings.PluginPlayerSettings;
+import me.corruptionsniper.compass.settings.PlayerSettings;
 import me.corruptionsniper.compass.settings.Settings;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -15,11 +15,11 @@ import java.util.Locale;
 
 public class SettingsCommand implements CommandExecutor {
 
-    PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
+    PlayerSettings playerSettings = new PlayerSettings();
     CommandUtil commandUtil = new CommandUtil();
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
@@ -29,7 +29,7 @@ public class SettingsCommand implements CommandExecutor {
             List<String> valueError = new ArrayList<>();
             List<String> formatError = new ArrayList<>();
 
-            Settings settings = pluginPlayerSettings.get(player);
+            Settings settings = playerSettings.get(player);
             ChatColor titleColour = ChatColor.LIGHT_PURPLE;
             ChatColor headingColour = ChatColor.YELLOW;
             ChatColor subHeadingColour = ChatColor.AQUA;
@@ -49,7 +49,7 @@ public class SettingsCommand implements CommandExecutor {
 
             } else switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "restoredefaults":
-                    pluginPlayerSettings.restoreDefaults(player);
+                    playerSettings.restoreDefaults(player);
                     player.sendMessage(ChatColor.GREEN + "Settings have been restored to the default settings.");
                     break;
                 case "format":
@@ -179,7 +179,7 @@ public class SettingsCommand implements CommandExecutor {
                         } else {
                             formatError.add(arg);
                         }
-                        pluginPlayerSettings.put(player, settings);
+                        playerSettings.put(player, settings);
                     }
                     commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid Settings:", settingError, "to see a list of possible settings type /settings format.");
                     commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid values:", valueError, "to see a list of values allowed for each setting type /settings format.");

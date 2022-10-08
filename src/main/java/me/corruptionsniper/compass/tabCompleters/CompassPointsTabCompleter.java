@@ -2,7 +2,7 @@ package me.corruptionsniper.compass.tabCompleters;
 
 import me.corruptionsniper.compass.CommandUtil;
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
-import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
+import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -66,8 +66,8 @@ public class CompassPointsTabCompleter implements TabCompleter {
                         }
                         break;
                     case "remove":
-                        PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
-                        for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
+                        PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
+                        for (CompassPoint compassPoint : playerCompassPoints.get(player)) {
                             options.add(compassPoint.getLabel());
                         }
                         break;

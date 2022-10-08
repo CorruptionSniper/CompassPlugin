@@ -1,8 +1,8 @@
 package me.corruptionsniper.compass;
 
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
-import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
-import me.corruptionsniper.compass.settings.PluginPlayerSettings;
+import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
+import me.corruptionsniper.compass.settings.PlayerSettings;
 import me.corruptionsniper.compass.settings.Settings;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,8 +11,8 @@ import java.util.*;
 
 public class Compass {
 
-    PluginPlayerSettings pluginPlayerSettings = new PluginPlayerSettings();
-    PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
+    PlayerSettings playerSettings = new PlayerSettings();
+    PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
 
     //The pixel width of a character (with a GUI scale of 1).
     int characterPixelWidth = 6;
@@ -20,7 +20,7 @@ public class Compass {
     ChatColor compassBaseColour = ChatColor.GRAY;
 
     public String compassGenerator(Player player) {
-        Settings settings = pluginPlayerSettings.get(player);
+        Settings settings = playerSettings.get(player);
         int guiScale = settings.getGuiScale();
         float fov = settings.getFov();
         int width = settings.getWidth();
@@ -46,7 +46,6 @@ public class Compass {
         which explains the use of a treemap that sorts in reverse order.
         */
         Map<Integer,ChatColor> chatColorPlacementMap = new TreeMap<>(Collections.reverseOrder());
-
         //Creation of the compass base.
         chatColorPlacementMap.put(0, compassBaseColour);
         StringBuilder compass = new StringBuilder();
@@ -55,7 +54,7 @@ public class Compass {
         }
 
         //Iterates through compass points to check if compass point is to be placed onto the compass, and if so, places it onto the compass.
-        for (CompassPoint compassPoint : pluginPlayerCompassPoints.get(player)) {
+        for (CompassPoint compassPoint : playerCompassPoints.get(player)) {
 
             Float compassPointBearing = compassPoint.getBearing();
 

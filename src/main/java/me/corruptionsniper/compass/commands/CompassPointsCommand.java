@@ -2,20 +2,17 @@ package me.corruptionsniper.compass.commands;
 
 import me.corruptionsniper.compass.CommandUtil;
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
-import me.corruptionsniper.compass.compassPoints.PluginPlayerCompassPoints;
+import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class CompassPointsCommand implements CommandExecutor {
-    PluginPlayerCompassPoints pluginPlayerCompassPoints = new PluginPlayerCompassPoints();
+    PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
     CommandUtil commandUtil = new CommandUtil();
 
     @Override
@@ -28,7 +25,7 @@ public class CompassPointsCommand implements CommandExecutor {
             ChatColor subHeadingColour = ChatColor.AQUA;
 
             if (args.length == 0) {
-                List<CompassPoint> compassPoints = pluginPlayerCompassPoints.get(player);
+                SortedSet<CompassPoint> compassPoints = playerCompassPoints.get(player);
                 StringBuilder compassPointsMessageList = new StringBuilder();
                 for (CompassPoint compassPoint: compassPoints) {
                     String properties = "";
@@ -45,11 +42,11 @@ public class CompassPointsCommand implements CommandExecutor {
                 player.sendMessage(commandUtil.setColour("Compass Points:", titleColour) + compassPointsMessageList);
             } else switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "restoredefaults":
-                    pluginPlayerCompassPoints.put(player,pluginPlayerCompassPoints.defaultCompassPoints());
+                    playerCompassPoints.put(player, playerCompassPoints.defaultCompassPoints());
                     player.sendMessage(ChatColor.GREEN + "Compass points have been restored to defaults.");
                     break;
                 case "format":
-                    player.sendMessage(commandUtil.setColour("Compass Points Add Format: ", headingColour) + "'/compasspoints add <compasspoint 1>; <compasspoint 2>; ... <compasspoint n>'\n" + commandUtil.setColour("Argument format:", headingColour) + "\n<name>,<type>,<properties>\n\n" + commandUtil.setColour("Properties format:", headingColour) + commandUtil.setColour("\nif <type> is equal to direction: ",subHeadingColour) + "bearing, colour(optional)" +  commandUtil.setColour("\nif <type> is equal to coordinate: ",subHeadingColour) +"x coordinate, z coordinate, colour(optional)");
+                    player.sendMessage(commandUtil.setColour("Compass Points Add Format: ", headingColour) + "'/compasspoints add <compasspoint 1>; <compasspoint 2>; ... <compasspoint n>'\n" + commandUtil.setColour("Argument format:", headingColour) + "\n<name>,<type>,<properties>\n\n" + commandUtil.setColour("Properties format:", headingColour) + commandUtil.setColour("\nif <type> is equal to 'direction': ", subHeadingColour) + "bearing, colour(optional)" + commandUtil.setColour("\nif <type> is equal to 'coordinate': ", subHeadingColour) + "x coordinate, z coordinate, colour(optional)");
                     break;
                 case "add":
                     List<String> typeErrorList = new ArrayList<>();
@@ -62,14 +59,18 @@ public class CompassPointsCommand implements CommandExecutor {
 
                     for (String compassPointToAdd : compassPointsToAdd) {
                         String[] compassPointProperties = compassPointToAdd.split(",");
-                        if (compassPointProperties.length < 2) {continue;}
+                        if (compassPointProperties.length < 2) {
+                            continue;
+                        }
                         String type = compassPointProperties[1].trim().toLowerCase(Locale.ROOT);
                         String label = compassPointProperties[0].trim();
                         Float degrees = null;
                         Float xCoordinate = null;
                         Float zCoordinate = null;
                         String colour = compassPointProperties[compassPointProperties.length - 1].trim().toLowerCase(Locale.ROOT);
-                        if (label.isEmpty()) {continue;}
+                        if (label.isEmpty()) {
+                            continue;
+                        }
                         try {
                             switch (type) {
                                 case "direction":
@@ -90,17 +91,18 @@ public class CompassPointsCommand implements CommandExecutor {
                             formatErrorList.add(label);
                             continue;
                         }
-                        CompassPoint compassPoint = new CompassPoint(type,label,degrees,xCoordinate,zCoordinate,null);
+                        CompassPoint compassPoint = new CompassPoint(type, label, degrees, xCoordinate, zCoordinate, null);
                         compassPoint.setColour(colour);
 
-                        pluginPlayerCompassPoints.putCompassPoint(player, compassPoint);
+                        playerCompassPoints.putCompassPoint(player, compassPoint);
                         compassPointsAdded.add(label);
                     }
-                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid format for:", formatErrorList,"type '/compassPoints format' to view the correct format.");
-                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid number format for:", numberFormatErrorList,"the number inputted was invalid for these compass points.");
-                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED,"Invalid compass type for:", typeErrorList,"the only available compass types are 'direction' and 'coordinate'");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid format for:", formatErrorList, "type '/compassPoints format' to view the correct format.");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid number format for:", numberFormatErrorList, "the number inputted was invalid for these compass points.");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid compass type for:", typeErrorList, "the only available compass types are 'direction' and 'coordinate'");
 
                     commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:", compassPointsAdded, "have been added to your compass");
+
                     break;
                 case "remove":
                     List<String> compassPointNotFoundError = new ArrayList<>();
@@ -109,7 +111,7 @@ public class CompassPointsCommand implements CommandExecutor {
                     String[] compassPointsToRemove = commandUtil.join(Arrays.asList(args), " ").substring(7).split(";");
                     for (String compassPointToRemove : compassPointsToRemove) {
                         String label = compassPointToRemove.trim();
-                        List<CompassPoint> compassPointList = pluginPlayerCompassPoints.get(player);
+                        SortedSet<CompassPoint> compassPointList = playerCompassPoints.get(player);
                         CompassPoint compassPointToBeRemoved = new CompassPoint(null,null,null,null,null,null);
                         for (CompassPoint compassPoint: compassPointList) {
                             if (compassPoint.getLabel().equals(label)) {
@@ -118,13 +120,13 @@ public class CompassPointsCommand implements CommandExecutor {
                             }
                         }
 
-                        if (pluginPlayerCompassPoints.remove(player,compassPointToBeRemoved)) {
+                        if (playerCompassPoints.removeCompassPoint(player,compassPointToBeRemoved)) {
                             compassPointsRemoved.add(label);
                         } else {
                             compassPointNotFoundError.add(label);
                         }
                     }
-                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointNotFoundError,"make sure you have types these in correctly.");
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointNotFoundError,"make sure you have types these in correctly, and that different compass points have been separated by a ';'.");
                     commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:",compassPointsRemoved,"have been successfully removed.");
                     break;
                 default:

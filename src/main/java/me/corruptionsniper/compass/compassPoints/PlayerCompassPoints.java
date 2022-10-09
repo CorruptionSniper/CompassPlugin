@@ -25,6 +25,7 @@ public class PlayerCompassPoints {
 
     public void putCompassPoint(Player player, CompassPoint compassPoint) {
         TreeSet<CompassPoint> compassPointsList = get(player);
+        compassPointsList.remove(compassPoint);
         compassPointsList.add(compassPoint);
         playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }

@@ -3,7 +3,9 @@ package me.corruptionsniper.compass.compassPoints;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.TreeSet;
+import java.util.UUID;
 
 public class PlayerCompassPoints {
     private static HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints = new HashMap<>();
@@ -30,8 +32,15 @@ public class PlayerCompassPoints {
         playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
 
-    public boolean removeCompassPoint(Player player, CompassPoint compassPoint) {
-        return playerCompassPoints.get(player.getUniqueId()).remove(compassPoint);
+    public CompassPoint getCompassPoint(Player player, Object object) {
+        for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
+            if (compassPoint.equals(object)) {return compassPoint;}
+        }
+        return null;
+    }
+
+    public boolean removeCompassPoint(Player player, Object object) {
+        return playerCompassPoints.get(player.getUniqueId()).remove(object);
     }
 
     public TreeSet<CompassPoint> defaultCompassPoints() {

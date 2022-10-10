@@ -23,21 +23,36 @@ public class CompassPoint implements Comparable<CompassPoint>{
     public String getType() {
         return  type;
     }
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getLabel() {
         return label;
+    }
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Float getBearing() {
         return bearing;
     }
+    public void setBearing(Float bearing) {
+        this.bearing = bearing;
+    }
 
     public Float getXCoordinate() {
         return xCoordinate;
     }
+    public void setXCoordinate(Float xCoordinate) {
+        this.xCoordinate = xCoordinate;
+    }
 
     public Float getZCoordinate() {
         return zCoordinate;
+    }
+    public void setZCoordinate(Float zCoordinate) {
+        this.zCoordinate = zCoordinate;
     }
 
     public ChatColor getColour() {
@@ -91,12 +106,13 @@ public class CompassPoint implements Comparable<CompassPoint>{
 
     @Override
     public boolean equals(Object anotherObject){
-        if (this == anotherObject) {
-            return true;
-        }
         if (anotherObject instanceof CompassPoint) {
             CompassPoint anotherCompassPoint = (CompassPoint) anotherObject;
             return label.equals(anotherCompassPoint.getLabel());
+        }
+        if (anotherObject instanceof String) {
+            String anotherString = (String) anotherObject;
+            return label.equals(anotherString);
         }
         return false;
     }

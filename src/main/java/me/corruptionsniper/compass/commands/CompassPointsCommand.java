@@ -98,42 +98,111 @@ public class CompassPointsCommand implements CommandExecutor {
                         compassPointsAdded.add(label);
                     }
                     commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid format for:", formatErrorList, "type '/compassPoints format' to view the correct format.");
-                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid number format for:", numberFormatErrorList, "the number inputted was invalid for these compass points.");
-                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid compass type for:", typeErrorList, "the only available compass types are 'direction' and 'coordinate'");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid value for:", numberFormatErrorList, "the number inputted was invalid for these compass points.");
+                    commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid type for:", typeErrorList, "the only available compass types are 'direction' and 'coordinate'");
 
                     commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:", compassPointsAdded, "have been added to your compass");
 
                     break;
                 case "remove":
-                    List<String> compassPointNotFoundError = new ArrayList<>();
+                    List<String> compassPointsNotFoundError0 = new ArrayList<>();
                     List<String> compassPointsRemoved = new ArrayList<>();
 
                     String[] compassPointsToRemove = commandUtil.join(Arrays.asList(args), " ").substring(7).split(";");
                     for (String compassPointToRemove : compassPointsToRemove) {
                         String label = compassPointToRemove.trim();
-                        SortedSet<CompassPoint> compassPointList = playerCompassPoints.get(player);
-                        CompassPoint compassPointToBeRemoved = new CompassPoint(null,null,null,null,null,null);
-                        for (CompassPoint compassPoint: compassPointList) {
-                            if (compassPoint.getLabel().equals(label)) {
-                                compassPointToBeRemoved = compassPoint;
-                                break;
-                            }
-                        }
 
-                        if (playerCompassPoints.removeCompassPoint(player,compassPointToBeRemoved)) {
+                        if (playerCompassPoints.removeCompassPoint(player,label)) {
                             compassPointsRemoved.add(label);
                         } else {
-                            compassPointNotFoundError.add(label);
+                            compassPointsNotFoundError0.add(label);
                         }
                     }
-                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointNotFoundError,"make sure you have types these in correctly, and that different compass points have been separated by a ';'.");
+                    commandUtil.listingMessage(player, ChatColor.RED , ChatColor.RED, "Compass points have not been found:",compassPointsNotFoundError0,"make sure you have types these in correctly, and that different compass points have been separated by a ';'.");
                     commandUtil.listingMessage(player, ChatColor.GREEN, ChatColor.AQUA, "Compass points:",compassPointsRemoved,"have been successfully removed.");
+                    break;
+                case "modify":
+                    List<String> compassPointsNotFoundError1 = new ArrayList<>();
+                    List<String> propertyError = new ArrayList<>();
+                    List<String> valueError = new ArrayList<>();
+                    List<String> formatError = new ArrayList<>();
+
+                    List<String> compassPointsModified = new ArrayList<>();
+
+                    String[] targets = commandUtil.join(Arrays.asList(args), " ").substring(7).split(";");
+                    for (String target : targets) {
+                        String[] targetSplit = target.split(",");
+                        String targetLabel = targetSplit[0].trim();
+                        CompassPoint compassPointToModify = playerCompassPoints.getCompassPoint(player,targetLabel);
+                        if (compassPointToModify != null) {
+                            playerCompassPoints.removeCompassPoint(player,compassPointToModify);
+                            for (String property : targetSplit) {
+                                String[] propertySplit = property.split(":",2);
+                                if (propertySplit.length == 2) {
+                                    String value = propertySplit[1].trim();
+                                    try {
+                                        switch (propertySplit[0].toLowerCase(Locale.ROOT)) {
+                                            case "label":
+                                                compassPointToModify.setLabel(value);
+                                                break;
+                                            case "type":
+                                                switch (value.toLowerCase(Locale.ROOT)) {
+                                                    case "direction":
+                                                        compassPointToModify.setType("direction");
+                                                        if (compassPointToModify.getBearing() == null) {
+                                                            compassPointToModify.setBearing(player.getLocation().getYaw() + 180);
+                                                        }
+                                                        break;
+                                                    case "coordinate":
+                                                        compassPointToModify.setType("coordinate");
+                                                        if (compassPointToModify.getXCoordinate() == null) {
+                                                            compassPointToModify.setXCoordinate((float) player.getLocation().getX());
+                                                        }
+                                                        if (compassPointToModify.getZCoordinate() == null) {
+                                                            compassPointToModify.setZCoordinate((float) player.getLocation().getZ());
+                                                        }
+                                                        break;
+                                                    default:
+                                                        valueError.add(targetLabel);
+                                                }
+                                                break;
+                                            case "bearing":
+                                                compassPointToModify.setBearing(Float.parseFloat(value));
+                                                break;
+                                            case "x-coordinate":
+                                                compassPointToModify.setXCoordinate(Float.parseFloat(value));
+                                                break;
+                                            case "z-coordinate":
+                                                compassPointToModify.setZCoordinate(Float.parseFloat(value));
+                                                break;
+                                            default:
+                                                propertyError.add(targetLabel);
+                                        }
+                                    } catch (NumberFormatException numberFormatException) {
+                                        valueError.add(targetLabel);
+                                    }
+                                }
+                            }
+
+                            playerCompassPoints.putCompassPoint(player,compassPointToModify);
+                            compassPointsModified.add(targetLabel);
+                        } else {
+                            compassPointsNotFoundError1.add(targetLabel);
+                        }
+                    }
+
+                    commandUtil.listingMessage(player,ChatColor.RED,ChatColor.RED,"Invalid format for:",formatError,"type '/compassPoints format' to view the correct format.");
+                    commandUtil.listingMessage(player,ChatColor.RED,ChatColor.RED,"Invalid property for:",propertyError,"the property was invalid for these compass points.");
+                    commandUtil.listingMessage(player,ChatColor.RED,ChatColor.RED,"Invalid value for:",valueError,"the number inputted was invalid for these compass points.");
+                    commandUtil.listingMessage(player,ChatColor.RED,ChatColor.RED,"Compass Points:",compassPointsNotFoundError1,"have not been found.");
+
+                    commandUtil.listingMessage(player,ChatColor.GREEN,ChatColor.AQUA,"Compass Points:",compassPointsModified,"have been successfully changed.");
+
                     break;
                 default:
                     player.sendMessage(ChatColor.RED + "The command does not exist");
             }
         }
-
         return false;
     }
 }

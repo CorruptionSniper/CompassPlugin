@@ -2,14 +2,14 @@ package me.corruptionsniper.compass.compassPoints;
 
 import org.bukkit.ChatColor;
 
-public class CompassPoint implements Comparable<CompassPoint>{
+public class CompassPoint implements Comparable{
 
-    String type;
-    String label;
-    Float bearing;
-    Float xCoordinate;
-    Float zCoordinate;
-    ChatColor colour;
+    private String type;
+    private String label;
+    private Float bearing;
+    private Float xCoordinate;
+    private Float zCoordinate;
+    private ChatColor colour;
 
     public CompassPoint(String type, String label, Float degrees, Float xCoordinate, Float zCoordinate, ChatColor colour) {
         this.type = type;
@@ -100,8 +100,14 @@ public class CompassPoint implements Comparable<CompassPoint>{
     }
 
     @Override
-    public int compareTo(CompassPoint anotherCompassPoint) {
-        return label.compareTo(anotherCompassPoint.getLabel());
+    public int compareTo(Object anotherObject) {
+        if (anotherObject instanceof CompassPoint) {
+            CompassPoint anotherCompassPoint = (CompassPoint) anotherObject;
+            return label.compareTo(anotherCompassPoint.getLabel());
+        } else if (anotherObject instanceof String) {
+            String anotherString = (String) anotherObject;
+            return label.compareTo(anotherString);
+        } else throw new IllegalArgumentException();
     }
 
     @Override

@@ -40,7 +40,10 @@ public class PlayerCompassPoints {
     }
 
     public boolean removeCompassPoint(Player player, Object object) {
-        return playerCompassPoints.get(player.getUniqueId()).remove(object);
+        boolean removed = false;
+        if (object instanceof CompassPoint) {removed = playerCompassPoints.get(player.getUniqueId()).remove(object);}
+        else if (object instanceof String) {removed =playerCompassPoints.get(player.getUniqueId()).remove(new CompassPoint(null,(String) object, null, null, null, null));}
+        return removed;
     }
 
     public TreeSet<CompassPoint> defaultCompassPoints() {

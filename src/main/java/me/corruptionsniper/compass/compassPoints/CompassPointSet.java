@@ -1,15 +1,18 @@
 package me.corruptionsniper.compass.compassPoints;
 
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Iterator;
 
-public class CompassPointSet extends AbstractSet {
+public class CompassPointSet extends AbstractSet<CompassPoint> {
 
-    transient CompassPoint[] elementData;
+    private transient CompassPoint[] elementData;
     private int size;
 
     public CompassPointSet() {
+        elementData = new CompassPoint[]{};
         size = 0;
+        System.out.println();
     }
 
     @Override
@@ -17,8 +20,11 @@ public class CompassPointSet extends AbstractSet {
         return size;
     }
 
-    private void incrementSize() {
-        size++;
+    private void increment() {elementData = Arrays.copyOf(elementData,size + 1);}
+
+    public CompassPoint get(Object o) {
+        CompassPoint c = elementData[binarySearch(o)];
+        return c.equals(o) ? c : null;
     }
 
     //not tested
@@ -29,70 +35,88 @@ public class CompassPointSet extends AbstractSet {
 
     //not tested
     private int binarySearch(Object o) {
-        if (!(o instanceof CompassPoint | o instanceof String)) throw new IllegalArgumentException();
         if (size() == 0) return 0;
-        int lb = 0;
-        int ub = size;
+        int lb = 0; //Lower Bound for which index the compass point should be located at.
+        int ub = size - 1; //Upperbound for which index the compass point should be located at.
+        boolean isFound = false;
+        int mid = 0;
 
-        while (true) {
-            int middle = (lb + ub)/2;
-            CompassPoint target = elementData[middle];
-            if (elementData[middle].equals(o)) {
-                return middle;
-            }
-            if (target.compareTo(elementData) > 0) {
-                lb = middle + 1;
-            } else {
-                ub = middle - 1;
-            }
+        while (!isFound) {
+            mid = (lb + ub) / 2;
             if (ub - lb == 0) {
-                return middle;
+                System.out.println(mid);
+                isFound = true;
             }
+            int compare = elementData[mid].compareTo(o);
+            if (compare == 0) {
+                isFound = true;
+            }
+            if (compare > 0) {
+                lb = mid + 1;
+            } else {
+                ub = mid;
+            }
+            System.out.println("r");
         }
+        System.out.println(mid);
+        return mid;
     }
 
-    //not tested
-    private void insert(int index, CompassPoint o) {
-        for (int i = size - 1; i > index; i--) {
-            elementData[i] = elementData[i + 1];
-        }
-        elementData[index] = o;
-        incrementSize();
+    //should work
+    private void insert(int index, CompassPoint c) {
+        if (size > index) {
+            if (!elementData[index].equals(c)) {
+                increment();
+                System.arraycopy(elementData, index, elementData, index + 1, size - index);
+            }
+        } else increment();
+        elementData[index] = c;
+        size++;
     }
 
-    //not tested
-    private void erase(int index) {
-        for (int i = index; i < size - 1; i++) {
-            elementData[i] = elementData[i + 1];
-        }
+    //should work
+    private boolean erase(int index) {
+        if (size - 1 >= index) {
+            System.arraycopy(elementData, index + 1, elementData, index, size - index);
+            size--;
+            return true;
+        } else return false;
     }
 
-    //not tested
+    //should work
     @Override
-    public boolean add(Object o) {
-        if (!(o instanceof CompassPoint)) {
-            return false;
-        }
-        CompassPoint c = (CompassPoint) o;
+    public boolean add(CompassPoint c) {
         insert(binarySearch(c),c);
         return true;
     }
 
 
-    //not tested
+    //should work
     @Override
     public boolean remove(Object o) {
-        int index = binarySearch(o);
-        if (elementData[binarySearch(o)].equals(o)) {
-            erase(index);
-            return true;
-        } else {
-            return false;
+        if (size == 0) {
+            int index = binarySearch(o);
+            if (elementData[index].equals(o)) return erase(index);
+        }
+        return false;
+    }
+
+    private class compassPointIterator implements Iterator<CompassPoint>{
+        int index = -1;
+
+        @Override
+        public boolean hasNext() {
+            return index != size - 1;
+        }
+
+        @Override
+        public CompassPoint next() {
+            return elementData[index + 1];
         }
     }
 
     @Override
-    public Iterator iterator() {
-        return null;
+    public Iterator<CompassPoint> iterator() {
+        return new compassPointIterator();
     }
 }

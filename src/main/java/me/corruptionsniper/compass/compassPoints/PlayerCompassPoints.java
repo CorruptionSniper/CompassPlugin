@@ -4,47 +4,44 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.UUID;
 
 public class PlayerCompassPoints {
-    private static HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints = new HashMap<>();
+    private static HashMap<UUID, CompassPointSet> playerCompassPoints = new HashMap<>();
 
-    public HashMap<UUID, TreeSet<CompassPoint>> getPlayerCompassPoints() {
+    public HashMap<UUID, CompassPointSet> getPlayerCompassPoints() {
         return playerCompassPoints;
     }
 
-    public TreeSet<CompassPoint> get(Player player) {
+    public CompassPointSet get(Player player) {
         if (!playerCompassPoints.containsKey(player.getUniqueId())) {
             playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints());
         }
         return playerCompassPoints.get(player.getUniqueId());
     }
 
-    public void put(Player player, TreeSet<CompassPoint> compassPointList) {
+    public void put(Player player, CompassPointSet compassPointList) {
         playerCompassPoints.put(player.getUniqueId(), compassPointList);
     }
 
     public void putCompassPoint(Player player, CompassPoint compassPoint) {
-        TreeSet<CompassPoint> compassPointsList = get(player);
+        CompassPointSet compassPointsList = get(player);
         compassPointsList.remove(compassPoint);
         compassPointsList.add(compassPoint);
         playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
 
+    //Refactor
     public CompassPoint getCompassPoint(Player player, Object object) {
-        for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
-            if (compassPoint.equals(object)) {return compassPoint;}
-        }
-        return null;
+        return playerCompassPoints.get(player.getUniqueId()).get(object);
     }
 
     public boolean removeCompassPoint(Player player, Object object) {
         return playerCompassPoints.get(player.getUniqueId()).remove(object);
     }
 
-    public TreeSet<CompassPoint> defaultCompassPoints() {
-        TreeSet<CompassPoint> defaultCompassPoints = new TreeSet<>();
+    public CompassPointSet defaultCompassPoints() {
+        CompassPointSet defaultCompassPoints = new CompassPointSet();
         defaultCompassPoints.add(new CompassPoint("direction","North",0F,null,null, ChatColor.WHITE));
         defaultCompassPoints.add(new CompassPoint("direction","North East",45F,null,null, ChatColor.WHITE));
         defaultCompassPoints.add(new CompassPoint("direction","East",90F,null,null, ChatColor.WHITE));

@@ -2,6 +2,7 @@ package me.corruptionsniper.compass.commands;
 
 import me.corruptionsniper.compass.CommandUtil;
 import me.corruptionsniper.compass.compassPoints.CompassPoint;
+import me.corruptionsniper.compass.compassPoints.CompassPointSet;
 import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -9,7 +10,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class CompassPointsCommand implements CommandExecutor {
     PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
@@ -25,7 +29,7 @@ public class CompassPointsCommand implements CommandExecutor {
             ChatColor subHeadingColour = ChatColor.AQUA;
 
             if (args.length == 0) {
-                SortedSet<CompassPoint> compassPoints = playerCompassPoints.get(player);
+                CompassPointSet compassPoints = playerCompassPoints.get(player);
                 StringBuilder compassPointsMessageList = new StringBuilder();
                 for (CompassPoint compassPoint: compassPoints) {
                     String properties = "";

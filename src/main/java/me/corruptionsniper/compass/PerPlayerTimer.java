@@ -50,7 +50,7 @@ public class PerPlayerTimer implements Listener {
         cleanupMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, ()-> {
             boolean compassSetting = playerSettings.get(player).getCompass();
             boolean compassBarContainsPlayer = compassBar.getPlayers().contains(player);
-
+            System.out.println("running");
             if (compassSetting) {
                 if (!compassBarContainsPlayer) {
                     compassBar.addPlayer(player);
@@ -59,7 +59,6 @@ public class PerPlayerTimer implements Listener {
             } else if (compassBarContainsPlayer) {
                 compassBar.removePlayer(player);
             }
-
         },0,period).getTaskId());
     }
 }

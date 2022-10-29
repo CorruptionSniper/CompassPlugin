@@ -32,6 +32,7 @@ public class JsonFiles {
 
         try {
             Writer writer = new FileWriter(file);
+            System.out.println(data);
             gson.toJson(data,writer);
             writer.flush();
             writer.close();

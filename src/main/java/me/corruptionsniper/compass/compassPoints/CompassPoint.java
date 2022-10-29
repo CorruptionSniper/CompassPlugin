@@ -1,15 +1,16 @@
 package me.corruptionsniper.compass.compassPoints;
 
 import org.bukkit.ChatColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class CompassPoint implements Comparable<CompassPoint>{
+public class CompassPoint implements Comparable<Object>{
 
-    String type;
-    String label;
-    Float bearing;
-    Float xCoordinate;
-    Float zCoordinate;
-    ChatColor colour;
+    private String type;
+    private String label;
+    private Float bearing;
+    private Float xCoordinate;
+    private Float zCoordinate;
+    private ChatColor colour;
 
     public CompassPoint(String type, String label, Float degrees, Float xCoordinate, Float zCoordinate, ChatColor colour) {
         this.type = type;
@@ -100,8 +101,16 @@ public class CompassPoint implements Comparable<CompassPoint>{
     }
 
     @Override
-    public int compareTo(CompassPoint anotherCompassPoint) {
-        return label.compareTo(anotherCompassPoint.getLabel());
+    public int compareTo(@NonNull Object o) {
+        if (o instanceof CompassPoint) {
+            CompassPoint c = (CompassPoint) o;
+            return label.compareTo(c.getLabel());
+
+        } else if (o instanceof String) {
+            String s = (String) o;
+            return label.compareTo(s);
+
+        } else throw new IllegalArgumentException();
     }
 
     @Override

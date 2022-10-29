@@ -32,6 +32,7 @@ public class PlayerCompassPoints {
         playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
 
+    //Refactor
     public CompassPoint getCompassPoint(Player player, Object object) {
         for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
             if (compassPoint.equals(object)) {return compassPoint;}

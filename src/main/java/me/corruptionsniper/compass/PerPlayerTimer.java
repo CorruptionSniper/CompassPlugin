@@ -19,6 +19,7 @@ public class PerPlayerTimer implements Listener {
     public PerPlayerTimer(Main main) {
         this.main = main;
     }
+
     PlayerSettings playerSettings = new PlayerSettings();
 
     private static HashMap<UUID, Integer> cleanupMap = new HashMap<>();
@@ -43,6 +44,7 @@ public class PerPlayerTimer implements Listener {
     private void timer(Player player) {
         //Creation of an instance of a BossBar(The Compass) for the player.
         BossBar compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
+        Compass playerCompass = new Compass(player);
 
         //Creation of an instance of a timer for the player,
         //Whilst its task ID is stored into a hashmap with the player's UUID.
@@ -55,7 +57,7 @@ public class PerPlayerTimer implements Listener {
                 if (!compassBarContainsPlayer) {
                     compassBar.addPlayer(player);
                 }
-                compassBar.setTitle(new Compass().compassGenerator(player));
+                compassBar.setTitle(playerCompass.compassGenerator());
             } else if (compassBarContainsPlayer) {
                 compassBar.removePlayer(player);
             }

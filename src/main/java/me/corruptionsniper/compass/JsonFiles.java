@@ -14,6 +14,7 @@ public class JsonFiles {
         this.javaPlugin = javaPlugin;
     }
 
+    // TODO: 19/11/2022 fix json writing/reading
     public File instanceFile(String fileName) {
         javaPlugin.getDataFolder().mkdir();
         File file = new File(javaPlugin.getDataFolder(), fileName);
@@ -32,7 +33,6 @@ public class JsonFiles {
 
         try {
             Writer writer = new FileWriter(file);
-            System.out.println(data);
             gson.toJson(data,writer);
             writer.flush();
             writer.close();
@@ -44,15 +44,14 @@ public class JsonFiles {
         }
     }
 
-    public <T> T read(String fileName, Class<T> classOfT) {
+    public <T> void initialize(String fileName, Class<T> classOfT) {
         File file = instanceFile(fileName);
 
         try {
             Reader reader = new FileReader(file);
-            T fileData = gson.fromJson(reader,(Type)classOfT);
+            gson.fromJson(reader,(Type)classOfT);
 
             System.out.println("Loaded: " + fileName);
-            return fileData;
 
         } catch (IOException e) {
             throw new RuntimeException(e);

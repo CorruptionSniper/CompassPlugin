@@ -22,7 +22,7 @@ public class SettingsCommand implements CommandExecutor {
     private final ChatColor headingColour = ChatColor.YELLOW;
     private final ChatColor subHeadingColour = ChatColor.AQUA;
 
-    List<String> changedSettings = new ArrayList<>();
+    List<String> changedSettings;
 
     List<String> settingError = new ArrayList<>();
     List<String> valueError = new ArrayList<>();
@@ -109,6 +109,7 @@ public class SettingsCommand implements CommandExecutor {
     }
 
     private void settings(Player player, String[] args) {
+        changedSettings = new ArrayList<>();
         Settings settings = playerSettings.get(player);
         for (String arg : args) {
             String[] splitArg = arg.toLowerCase(Locale.ROOT).split(":", 2);

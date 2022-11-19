@@ -20,8 +20,8 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         //Loading files to their corresponding classes.
-        jsonFiles.read(compassPointsFileName, PlayerCompassPoints.class);
-        jsonFiles.read(playerSettingsFileName, PlayerSettings.class);
+        jsonFiles.initialize(compassPointsFileName, PlayerCompassPoints.class);
+        jsonFiles.initialize(playerSettingsFileName, PlayerSettings.class);
         getCommand("settings").setExecutor(new SettingsCommand());
         getCommand("compassPoints").setExecutor(new CompassPointsCommand());
 

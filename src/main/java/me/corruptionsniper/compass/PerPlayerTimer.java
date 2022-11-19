@@ -15,14 +15,17 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class PerPlayerTimer implements Listener {
+    private static final int PERIOD = 20;
+    private static final PlayerSettings playerSettings = new PlayerSettings();
+
     private final Main main;
+
     public PerPlayerTimer(Main main) {
         this.main = main;
     }
 
-    PlayerSettings playerSettings = new PlayerSettings();
 
-    private static HashMap<UUID, Integer> cleanupMap = new HashMap<>();
+    private static final HashMap<UUID, Integer> cleanupMap = new HashMap<>();
 
     @EventHandler
     private void onJoin(PlayerJoinEvent event) {
@@ -39,28 +42,25 @@ public class PerPlayerTimer implements Listener {
         cleanupMap.remove(player.getUniqueId());
     }
 
-    int period = 20;
-
     private void timer(Player player) {
         //Creation of an instance of a BossBar(The Compass) for the player.
-        BossBar compassBar = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
+        BossBar compass = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
         Compass playerCompass = new Compass(player);
 
         //Creation of an instance of a timer for the player,
         //Whilst its task ID is stored into a hashmap with the player's UUID.
         //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
         cleanupMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, ()-> {
-            boolean compassSetting = playerSettings.get(player).getCompass();
-            boolean compassBarContainsPlayer = compassBar.getPlayers().contains(player);
-            System.out.println("running");
-            if (compassSetting) {
+            boolean isCompassOn = playerSettings.get(player).getCompass();
+            boolean compassBarContainsPlayer = compass.getPlayers().contains(player);
+            if (isCompassOn) {
                 if (!compassBarContainsPlayer) {
-                    compassBar.addPlayer(player);
+                    compass.addPlayer(player);
                 }
-                compassBar.setTitle(playerCompass.compassGenerator());
+                compass.setTitle(playerCompass.compassGenerator());
             } else if (compassBarContainsPlayer) {
-                compassBar.removePlayer(player);
+                compass.removePlayer(player);
             }
-        },0,period).getTaskId());
+        },0, PERIOD).getTaskId());
     }
 }

@@ -10,18 +10,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
-    JsonFiles jsonFiles = new JsonFiles(this);
-    PlayerSettings playerSettings = new PlayerSettings();
-    PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
+    private final JsonFiles jsonFiles = new JsonFiles(this);
+    private final PlayerSettings playerSettings = new PlayerSettings();
+    private final PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
 
-    String playerSettingsFileName = "playerSettings.json";
-    String compassPointsFileName = "compassPoints.json";
+    private final String playerSettingsFileName = "playerSettings.json";
+    private final String compassPointsFileName = "compassPoints.json";
 
     @Override
     public void onEnable() {
         //Loading files to their corresponding classes.
-        jsonFiles.initialize(compassPointsFileName, PlayerCompassPoints.class);
-        jsonFiles.initialize(playerSettingsFileName, PlayerSettings.class);
+        PlayerSettings.setMap(jsonFiles.read(playerSettingsFileName, playerSettings.getMap().getClass()));
+        PlayerCompassPoints.setMap(jsonFiles.read(compassPointsFileName, playerCompassPoints.getMap().getClass()));
+
         getCommand("settings").setExecutor(new SettingsCommand());
         getCommand("compassPoints").setExecutor(new CompassPointsCommand());
 
@@ -35,7 +36,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         //Saving classes to their corresponding files.
-        jsonFiles.write(playerSettingsFileName, playerSettings.getPlayerSettings());
-        jsonFiles.write(compassPointsFileName, playerCompassPoints.getPlayerCompassPoints());
+        jsonFiles.write(playerSettingsFileName, playerSettings.getMap());
+        jsonFiles.write(compassPointsFileName, playerCompassPoints.getMap());
     }
 }

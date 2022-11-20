@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
-import java.lang.reflect.Type;
 
 public class JsonFiles {
 
@@ -30,7 +29,6 @@ public class JsonFiles {
 
     public <T> void write(String fileName, T data) {
         File file = instanceFile(fileName);
-
         try {
             Writer writer = new FileWriter(file);
             gson.toJson(data,writer);
@@ -44,15 +42,15 @@ public class JsonFiles {
         }
     }
 
-    public <T> void initialize(String fileName, Class<T> classOfT) {
+    public <T> T read(String fileName, Class<T> classOfT) {
         File file = instanceFile(fileName);
 
         try {
             Reader reader = new FileReader(file);
-            gson.fromJson(reader,(Type)classOfT);
+            T data = gson.fromJson(reader,classOfT);
 
             System.out.println("Loaded: " + fileName);
-
+            return data;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

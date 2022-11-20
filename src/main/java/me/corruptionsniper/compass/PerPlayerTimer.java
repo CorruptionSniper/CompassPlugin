@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -33,19 +34,21 @@ public class PerPlayerTimer implements Listener {
         saveTimer(player);
     }
 
-    //Creation of an instance of a timer for the player,
-    //Whilst its task ID is stored into a hashmap with the player's UUID.
-    //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
     private void saveTimer(Player player) {
-        timerMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, startTimer(player),0, PERIOD).getTaskId());
+        timerMap.put(player.getUniqueId(), startTimer(player).getTaskId());
     }
 
-    private Runnable startTimer(Player player) {
+    private BukkitTask startTimer(Player player) {
+        return Bukkit.getScheduler().runTaskTimer(main, setupTimer(player),0, PERIOD);
+    }
+
+    private Runnable setupTimer(Player player) {
         //Creation of an instance of a BossBar(The Compass) for the player.
         BossBar compass = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
         Compass playerCompass = new Compass(player);
         return ()-> timer(player, compass, playerCompass);
     }
+
     private void timer(Player player, BossBar compass, Compass playerCompass) {
         boolean isCompassOn = playerSettings.get(player).getCompass();
         boolean compassBarContainsPlayer = compass.getPlayers().contains(player);

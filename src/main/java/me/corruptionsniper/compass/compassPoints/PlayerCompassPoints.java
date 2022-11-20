@@ -10,8 +10,12 @@ import java.util.UUID;
 public class PlayerCompassPoints {
     private static HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints = new HashMap<>();
 
-    public HashMap<UUID, TreeSet<CompassPoint>> getPlayerCompassPoints() {
+    public HashMap<UUID, TreeSet<CompassPoint>> getMap() {
         return playerCompassPoints;
+    }
+
+    public static void setMap(HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints) {
+        PlayerCompassPoints.playerCompassPoints = playerCompassPoints != null ? playerCompassPoints : new HashMap<>();;
     }
 
     public TreeSet<CompassPoint> get(Player player) {
@@ -25,19 +29,19 @@ public class PlayerCompassPoints {
         playerCompassPoints.put(player.getUniqueId(), compassPointList);
     }
 
-    public void putCompassPoint(Player player, CompassPoint compassPoint) {
-        TreeSet<CompassPoint> compassPointsList = get(player);
-        compassPointsList.remove(compassPoint);
-        compassPointsList.add(compassPoint);
-        playerCompassPoints.put(player.getUniqueId(), compassPointsList);
-    }
-
     //Refactor
     public CompassPoint getCompassPoint(Player player, Object object) {
         for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
             if (compassPoint.equals(object)) {return compassPoint;}
         }
         return null;
+    }
+
+    public void putCompassPoint(Player player, CompassPoint compassPoint) {
+        TreeSet<CompassPoint> compassPointsList = get(player);
+        compassPointsList.remove(compassPoint);
+        compassPointsList.add(compassPoint);
+        playerCompassPoints.put(player.getUniqueId(), compassPointsList);
     }
 
     public boolean removeCompassPoint(Player player, Object object) {

@@ -25,42 +25,50 @@ public class PerPlayerTimer implements Listener {
     }
 
 
-    private static final HashMap<UUID, Integer> cleanupMap = new HashMap<>();
+    private static final HashMap<UUID, Integer> timerMap = new HashMap<>();
 
     @EventHandler
     private void onJoin(PlayerJoinEvent event) {
-        //Starting of an instance of a timer for the player.
-        timer(event.getPlayer());
+        Player player = event.getPlayer();
+        saveTimer(player);
+    }
+
+    //Creation of an instance of a timer for the player,
+    //Whilst its task ID is stored into a hashmap with the player's UUID.
+    //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
+    private void saveTimer(Player player) {
+        timerMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, startTimer(player),0, PERIOD).getTaskId());
+    }
+
+    private Runnable startTimer(Player player) {
+        //Creation of an instance of a BossBar(The Compass) for the player.
+        BossBar compass = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
+        Compass playerCompass = new Compass(player);
+        return ()-> timer(player, compass, playerCompass);
+    }
+    private void timer(Player player, BossBar compass, Compass playerCompass) {
+        boolean isCompassOn = playerSettings.get(player).getCompass();
+        boolean compassBarContainsPlayer = compass.getPlayers().contains(player);
+        if (isCompassOn) {
+            if (!compassBarContainsPlayer) {
+                compass.addPlayer(player);
+            }
+            compass.setTitle(playerCompass.compassGenerator());
+        } else if (compassBarContainsPlayer) {
+            compass.removePlayer(player);
+        }
     }
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        //Deletion of the player's timer instance.
-        Bukkit.getScheduler().cancelTask(cleanupMap.get(player.getUniqueId()));
-        //Removing of the player from the hashmap.
-        cleanupMap.remove(player.getUniqueId());
+        stopTimer(player);
     }
 
-    private void timer(Player player) {
-        //Creation of an instance of a BossBar(The Compass) for the player.
-        BossBar compass = Bukkit.createBossBar("", BarColor.YELLOW, BarStyle.SOLID);
-        Compass playerCompass = new Compass(player);
-
-        //Creation of an instance of a timer for the player,
-        //Whilst its task ID is stored into a hashmap with the player's UUID.
-        //(So that when the player leaves the server, the hashmap can be accessed to disable the timer).
-        cleanupMap.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, ()-> {
-            boolean isCompassOn = playerSettings.get(player).getCompass();
-            boolean compassBarContainsPlayer = compass.getPlayers().contains(player);
-            if (isCompassOn) {
-                if (!compassBarContainsPlayer) {
-                    compass.addPlayer(player);
-                }
-                compass.setTitle(playerCompass.compassGenerator());
-            } else if (compassBarContainsPlayer) {
-                compass.removePlayer(player);
-            }
-        },0, PERIOD).getTaskId());
+    private void stopTimer(Player player) {
+        //Deletion of the player's timer instance.
+        Bukkit.getScheduler().cancelTask(timerMap.get(player.getUniqueId()));
+        //Removing of the player from the hashmap.
+        timerMap.remove(player.getUniqueId());
     }
 }

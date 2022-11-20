@@ -20,7 +20,7 @@ public class Compass {
     private static final PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
     private static final PlayerSettings playerSettings = new PlayerSettings();
 
-    Player player;
+    private final Player player;
     public Compass(Player player) {
         this.player = player;
     }

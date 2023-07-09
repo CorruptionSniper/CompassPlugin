@@ -12,7 +12,7 @@ public class CompassPoint implements Comparable<Object>{
     private Float zCoordinate;
     private ChatColor colour;
 
-    public CompassPoint(String type, String label, Float degrees, Float xCoordinate, Float zCoordinate, ChatColor colour) {
+    public CompassPoint(String label, String type, Float degrees, Float xCoordinate, Float zCoordinate, ChatColor colour) {
         this.type = type;
         this.label = label;
         this.bearing = degrees;

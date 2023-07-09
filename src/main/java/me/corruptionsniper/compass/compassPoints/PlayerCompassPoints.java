@@ -1,66 +1,61 @@
 package me.corruptionsniper.compass.compassPoints;
 
+import me.corruptionsniper.compass.PlayerMap;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
-public class PlayerCompassPoints {
-    private static HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints = new HashMap<>();
+public class PlayerCompassPoints extends PlayerMap<TreeSet<CompassPoint>> {
 
+    private static HashMap<UUID, TreeSet<CompassPoint>> playerCompassPointsMap = new HashMap<>();
+
+    @Override
+    public String getFileName() {
+        return "compassPoints.json";
+    }
+
+    @Override
     public HashMap<UUID, TreeSet<CompassPoint>> getMap() {
-        return playerCompassPoints;
+        return playerCompassPointsMap;
     }
 
-    public static void setMap(HashMap<UUID, TreeSet<CompassPoint>> playerCompassPoints) {
-        PlayerCompassPoints.playerCompassPoints = playerCompassPoints != null ? playerCompassPoints : new HashMap<>();;
+    @Override
+    public void setMap(HashMap<UUID, TreeSet<CompassPoint>> dataMap) {
+        if (dataMap != null) playerCompassPointsMap = dataMap;
+        else System.out.println("dataMap is null!");
     }
 
-    public TreeSet<CompassPoint> get(Player player) {
-        if (!playerCompassPoints.containsKey(player.getUniqueId())) {
-            playerCompassPoints.put(player.getUniqueId(),defaultCompassPoints());
-        }
-        return playerCompassPoints.get(player.getUniqueId());
+    public TreeSet<CompassPoint> get(UUID playerUUID) {
+        return super.get(playerUUID, privateGet(playerUUID));
     }
 
-    public void put(Player player, TreeSet<CompassPoint> compassPointList) {
-        playerCompassPoints.put(player.getUniqueId(), compassPointList);
+    private TreeSet<CompassPoint> privateGet(UUID playerUUID) {
+        return playerCompassPointsMap.get(playerUUID);
     }
 
-    //Refactor
-    public CompassPoint getCompassPoint(Player player, Object object) {
-        for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
-            if (compassPoint.equals(object)) {return compassPoint;}
-        }
-        return null;
+    @Override
+    public TreeSet<CompassPoint> put(UUID playerUUID, TreeSet<CompassPoint> value) {
+        return playerCompassPointsMap.put(playerUUID,value);
     }
 
-    public void putCompassPoint(Player player, CompassPoint compassPoint) {
-        TreeSet<CompassPoint> compassPointsList = get(player);
-        compassPointsList.remove(compassPoint);
-        compassPointsList.add(compassPoint);
-        playerCompassPoints.put(player.getUniqueId(), compassPointsList);
+    @Override
+    public TreeSet<CompassPoint> restoreDefaults(UUID playerUUID) {
+        return super.restoreDefaults(playerUUID);
     }
 
-    public boolean removeCompassPoint(Player player, Object object) {
-        boolean removed = false;
-        if (object instanceof CompassPoint) {removed = playerCompassPoints.get(player.getUniqueId()).remove(object);}
-        else if (object instanceof String) {removed =playerCompassPoints.get(player.getUniqueId()).remove(new CompassPoint(null,(String) object, null, null, null, null));}
-        return removed;
-    }
-
-    public TreeSet<CompassPoint> defaultCompassPoints() {
-        TreeSet<CompassPoint> defaultCompassPoints = new TreeSet<>();
-        defaultCompassPoints.add(new CompassPoint("direction","North",0F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","North East",45F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","East",90F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","South East",135F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","South",180F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","South West",225F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","West",270F,null,null, ChatColor.WHITE));
-        defaultCompassPoints.add(new CompassPoint("direction","North West",315F,null,null, ChatColor.WHITE));
-        return defaultCompassPoints;
+    @Override
+    public TreeSet<CompassPoint> defaults() {
+        TreeSet<CompassPoint> defaultsCompassPoints = new TreeSet<>();
+        defaultsCompassPoints.add(new CompassPoint("East","bearing", 90F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("North","bearing", 0F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("North East","bearing", 45F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("North West","bearing", 315F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("South","bearing", 180F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("South East","bearing", 135F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("South West","bearing", 225F, null, null, ChatColor.WHITE));
+        defaultsCompassPoints.add(new CompassPoint("West","bearing", 270F, null, null, ChatColor.WHITE));
+        return defaultsCompassPoints;
     }
 }

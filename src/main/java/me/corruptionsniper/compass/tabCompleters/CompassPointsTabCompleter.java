@@ -67,7 +67,7 @@ public class CompassPointsTabCompleter implements TabCompleter {
                         break;
                     case "remove":
                         PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
-                        for (CompassPoint compassPoint : playerCompassPoints.get(player)) {
+                        for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
                             options.add(compassPoint.getLabel());
                         }
                         break;

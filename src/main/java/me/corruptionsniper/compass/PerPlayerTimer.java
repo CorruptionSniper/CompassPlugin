@@ -50,7 +50,7 @@ public class PerPlayerTimer implements Listener {
     }
 
     private void timer(Player player, BossBar compass, Compass playerCompass) {
-        boolean isCompassOn = playerSettings.get(player).getCompass();
+        boolean isCompassOn = playerSettings.get(player.getUniqueId()).getCompass();
         boolean compassBarContainsPlayer = compass.getPlayers().contains(player);
         if (isCompassOn) {
             if (!compassBarContainsPlayer) {

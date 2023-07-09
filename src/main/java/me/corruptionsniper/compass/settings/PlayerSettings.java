@@ -1,35 +1,51 @@
 package me.corruptionsniper.compass.settings;
 
-import org.bukkit.entity.Player;
+import me.corruptionsniper.compass.PlayerMap;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-public class PlayerSettings {
-    private static HashMap<UUID, Settings> playerSettings = new HashMap<>();
+public class PlayerSettings extends PlayerMap<Settings> {
 
+    private static HashMap<UUID, Settings> playerSettingsMap =  new HashMap<>();
+
+    @Override
+    public String getFileName() {
+        return "playerSettings.json";
+    }
+
+    @Override
     public HashMap<UUID, Settings> getMap() {
-        return playerSettings;
+        return playerSettingsMap;
     }
 
-    public static void setMap(HashMap<UUID, Settings> playerSettings) {
-        PlayerSettings.playerSettings = playerSettings != null ? playerSettings : new HashMap<>();
+    @Override
+    public void setMap(HashMap<UUID, Settings> dataMap) {
+        if (dataMap != null) playerSettingsMap = dataMap;
     }
 
-    public Settings get(Player player) {
-        if (playerSettings.get(player.getUniqueId()) == null) {
-            restoreDefaults(player);
-        }
-        return playerSettings.get(player.getUniqueId());
-    }
-    public void put(Player player, Settings settings) {
-        playerSettings.put(player.getUniqueId(),settings);
+    public Settings get(UUID playerUUID) {
+        return super.get(playerUUID, privateGet(playerUUID));
     }
 
-
-    public void restoreDefaults(Player player) {
-        Settings defaultSettings = new Settings(true,3,70,1,1920,1080);
-        playerSettings.put(player.getUniqueId(),defaultSettings);
+    private Settings privateGet(UUID playerUUID) {
+        return playerSettingsMap.get(playerUUID);
     }
 
+    @Override
+    public Settings put(UUID playerUUID, Settings settings) {
+        return playerSettingsMap.put(playerUUID, settings);
+    }
+
+    @Override
+    public Settings restoreDefaults(UUID playerUUID) {
+        Settings defaults = defaults();
+        put(playerUUID,defaults);
+        return defaults;
+    }
+
+    @Override
+    public Settings defaults() {
+        return new Settings(true,4,70,1,1920,1080);
+    }
 }

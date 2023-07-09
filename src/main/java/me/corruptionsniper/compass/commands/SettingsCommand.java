@@ -54,7 +54,7 @@ public class SettingsCommand implements CommandExecutor {
     }
 
     private void standard(Player player) {
-        Settings settings = playerSettings.get(player);
+        Settings settings = playerSettings.get(player.getUniqueId());
         String compass = commandUtil.setColour("Compass: ", headingColour);
         if (settings.getCompass()) {
             compass += "true\n";
@@ -69,7 +69,7 @@ public class SettingsCommand implements CommandExecutor {
     }
 
     private void restoreDefaults(Player player) {
-        playerSettings.restoreDefaults(player);
+        playerSettings.restoreDefaults(player.getUniqueId());
         player.sendMessage(ChatColor.GREEN + "Settings have been restored to the default settings.");
     }
 
@@ -110,7 +110,7 @@ public class SettingsCommand implements CommandExecutor {
 
     private void settings(Player player, String[] args) {
         changedSettings = new ArrayList<>();
-        Settings settings = playerSettings.get(player);
+        Settings settings = playerSettings.get(player.getUniqueId());
         for (String arg : args) {
             String[] splitArg = arg.toLowerCase(Locale.ROOT).split(":", 2);
 
@@ -204,7 +204,7 @@ public class SettingsCommand implements CommandExecutor {
             } else {
                 formatError.add(arg);
             }
-            playerSettings.put(player, settings);
+            playerSettings.put(player.getUniqueId(), settings);
         }
         commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid Settings:", settingError, "to see a list of possible settings type /settings format.");
         commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid values:", valueError, "to see a list of values allowed for each setting type /settings format.");

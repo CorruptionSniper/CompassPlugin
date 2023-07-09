@@ -1,15 +1,11 @@
 package me.corruptionsniper.compass.commands;
 
 import me.corruptionsniper.compass.CommandUtil;
-import me.corruptionsniper.compass.compassPoints.CompassPoint;
 import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.util.*;
 
 public class CompassPointsCommand implements CommandExecutor {
     private final PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
@@ -21,7 +17,7 @@ public class CompassPointsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
+        /*if (sender instanceof Player) {
             Player player = (Player) sender;
 
             if (args.length == 0) {
@@ -50,7 +46,7 @@ public class CompassPointsCommand implements CommandExecutor {
     }
 
     private void standard(Player player) {
-        SortedSet<CompassPoint> compassPoints = playerCompassPoints.get(player);
+        SortedSet<CompassPoint> compassPoints = playerCompassPoints.get(player.getUniqueId());
         StringBuilder compassPointsMessageList = new StringBuilder();
         for (CompassPoint compassPoint: compassPoints) {
             String properties = "";
@@ -68,7 +64,7 @@ public class CompassPointsCommand implements CommandExecutor {
     }
 
     private void restoreDefaults(Player player) {
-        playerCompassPoints.put(player, playerCompassPoints.defaultCompassPoints());
+        playerCompassPoints.restoreDefaults(player.getUniqueId());
         player.sendMessage(ChatColor.GREEN + "Compass points have been restored to defaults.");
     }
 
@@ -122,7 +118,7 @@ public class CompassPointsCommand implements CommandExecutor {
             CompassPoint compassPoint = new CompassPoint(type, label, degrees, xCoordinate, zCoordinate, null);
             compassPoint.setColour(colour);
 
-            playerCompassPoints.putCompassPoint(player, compassPoint);
+            //playerCompassPoints.putCompassPoint(player, compassPoint);
             compassPointsAdded.add(label);
         }
         commandUtil.listingMessage(player, ChatColor.RED, ChatColor.RED, "Invalid format for:", formatError, "type '/compassPoints format' to view the correct format.");
@@ -213,7 +209,7 @@ public class CompassPointsCommand implements CommandExecutor {
                     }
                 }
 
-                playerCompassPoints.putCompassPoint(player,compassPointToModify);
+                //playerCompassPoints.putCompassPoint(player,compassPointToModify);
                 compassPointsModified.add(targetLabel);
             } else {
                 notFoundError.add(targetLabel);
@@ -226,5 +222,5 @@ public class CompassPointsCommand implements CommandExecutor {
         commandUtil.listingMessage(player,ChatColor.RED,ChatColor.RED,"Compass Points:",notFoundError,"have not been found.");
 
         commandUtil.listingMessage(player,ChatColor.GREEN,ChatColor.AQUA,"Compass Points:",compassPointsModified,"have been successfully changed.");
-    }
+    */return false;}
 }

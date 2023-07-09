@@ -10,33 +10,44 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
-    private final JsonFiles jsonFiles = new JsonFiles(this);
-    private final PlayerSettings playerSettings = new PlayerSettings();
-    private final PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
-
-    private final String playerSettingsFileName = "playerSettings.json";
-    private final String compassPointsFileName = "compassPoints.json";
+    JsonFiles jsonFiles = new JsonFiles(this);
+    PlayerSettings playerSettings = new PlayerSettings();
+    PlayerCompassPoints playerCompassPoints = new PlayerCompassPoints();
 
     @Override
     public void onEnable() {
-        //Loading files to their corresponding classes.
-        PlayerSettings.setMap(jsonFiles.read(playerSettingsFileName, playerSettings.getMap().getClass()));
-        PlayerCompassPoints.setMap(jsonFiles.read(compassPointsFileName, playerCompassPoints.getMap().getClass()));
+        loadFromFiles();
+        setExecutors();
+        setTabCompleters();
+        registerEvents();
+    }
 
+    private void loadFromFiles() {
+        playerSettings.setMap(jsonFiles.read(playerSettings.getFileName(), playerSettings.getMap().getClass()));
+        playerCompassPoints.setMap(jsonFiles.read(playerCompassPoints.getFileName(), playerCompassPoints.getMap().getClass()));
+    }
+
+    private void setExecutors() {
         getCommand("settings").setExecutor(new SettingsCommand());
         getCommand("compassPoints").setExecutor(new CompassPointsCommand());
+    }
 
+    private void setTabCompleters() {
         getCommand("settings").setTabCompleter(new SettingsTabCompleter());
         getCommand("compassPoints").setTabCompleter(new CompassPointsTabCompleter());
+    }
 
-        //Registers events to PerPlayerTimer class.
+    private void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new PerPlayerTimer(this),this);
     }
 
     @Override
     public void onDisable() {
-        //Saving classes to their corresponding files.
-        jsonFiles.write(playerSettingsFileName, playerSettings.getMap());
-        jsonFiles.write(compassPointsFileName, playerCompassPoints.getMap());
+        saveToFiles();
+    }
+
+    private void saveToFiles() {
+        jsonFiles.write(playerSettings.getFileName(), playerSettings.getMap());
+        jsonFiles.write(playerCompassPoints.getFileName(), playerCompassPoints.getMap());
     }
 }

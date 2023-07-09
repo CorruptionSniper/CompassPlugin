@@ -5,9 +5,12 @@ import me.corruptionsniper.compass.compassPoints.PlayerCompassPoints;
 import me.corruptionsniper.compass.settings.PlayerSettings;
 import me.corruptionsniper.compass.settings.Settings;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Compass {
 
@@ -38,7 +41,7 @@ public class Compass {
     private StringBuilder compass = new StringBuilder();
 
     public String compassGenerator() {
-        Settings settings = playerSettings.get(player);
+        Settings settings = playerSettings.get(player.getUniqueId());
         int compassLength = getCompassLength(settings);
         emptyColorIndexMap();
 
@@ -46,7 +49,7 @@ public class Compass {
         insertCompassPoints(compassLength, settings);
         addAllColoursToCompass();
 
-        return compass.toString();
+    return compass.toString();
     }
 
     //Calculates the length of the compass proportionally to the width of the user's screen,
@@ -55,6 +58,10 @@ public class Compass {
         float guiScale = settings.getGuiScale();
         float compassScreenCoverage = settings.getScreenCoverage();
         return (int) ((settings.getWidth() * compassScreenCoverage)/(CHAR_WIDTH_IN_PIXELS * guiScale));
+    }
+
+    private void emptyColorIndexMap() {
+        colourIndexMap = new TreeMap<>(Collections.reverseOrder());
     }
 
     //The in-game Field Of View gets altered by the aspect ratio of the user's screen, therefore it has to be adjusted.
@@ -71,10 +78,6 @@ public class Compass {
             fov = polynomialFunction(fov, new float[]{1.25F, 1.43F, -0.0026F});
         }
         return fov;
-    }
-
-    private void emptyColorIndexMap() {
-        colourIndexMap = new TreeMap<>(Collections.reverseOrder());
     }
 
     private void generateCompassBase(int length) {
@@ -94,11 +97,11 @@ public class Compass {
     private void insertCompassPoints(int length, Settings settings) {
         float playerFov = getCorrectFOV(settings);
         float playerBearing = player.getLocation().getYaw() + 180;
-        for (CompassPoint compassPoint : playerCompassPoints.get(player)) {
+        for (CompassPoint compassPoint : playerCompassPoints.get(player.getUniqueId())) {
 
             float relativeBearing = getPlayerRelativeBearing(playerFov, playerBearing, compassPoint);
 
-            boolean isCompassPointInView = !(relativeBearing > playerFov / 2);
+            boolean isCompassPointInView = relativeBearing < playerFov / 2;
             if (isCompassPointInView) {
                 int indexOfCompassPoint = getPlacement(length, playerFov, relativeBearing);
                 String compassPointName = generateCompassPointName(compassPoint);
@@ -120,23 +123,32 @@ public class Compass {
         return playerRelativeBearing;
     }
 
+    //Returns the bearing of the compassPoint in relation to the player according to the type of compass point.
+    private float getCompassPointBearing(CompassPoint compassPoint) {
+        float bearing;
+        String compassPointType = compassPoint.getType();
+        switch (compassPointType) {
+            case "bearing":
+                bearing = compassPoint.getBearing();
+                break;
+            case "coordinate":
+                double dX = compassPoint.getXCoordinate() - player.getLocation().getX();
+                double dZ = player.getLocation().getZ() - compassPoint.getZCoordinate();
+                final float fromRadiansToDegrees = 57.2957795131F;
+                bearing = (float) (Math.atan2(dX, dZ) * fromRadiansToDegrees);
+                break;
+            default:
+                throw new RuntimeException("Unknown Compass Type: " + compassPointType);
+        }
+        return bearing;
+    }
+
     //Placement of the compass point on compass. (The use of a cubic is to account for Minecraft FOV scaling, which stretches the screen)
     private int getPlacement(int length, float fov, float difference) {
         final float spread = 0.5F;
         float fovStretchingModelFunction = 0.5F * polynomialFunction((2 * difference)/ fov, new float[]{0F, 1 - spread, 0F, spread});
         float percentagePlacement = fovStretchingModelFunction + 0.5F;
         return (int) (length * percentagePlacement);
-    }
-
-    //Adding colour and index of compass point onto map.
-    private void insertCompassPointColour(CompassPoint compassPoint, int index, String compassPointName) {
-        insertColourInMap(index, compassPoint.getColour());
-        insertColourInMap(index + compassPointName.length(), compassBaseColour);
-    }
-
-    //Placing of compass point on compass
-    private void insertCompassPoint(int placement, String compassPointName) {
-        compass.replace(placement, placement + compassPointName.length(), compassPointName);
     }
 
     //Name of the compass point on compass.
@@ -149,23 +161,15 @@ public class Compass {
         return compassPointInitials.toString();
     }
 
-    //Returns the bearing of the compassPoint in relation to the player according to the type of compass point.
-    private float getCompassPointBearing(CompassPoint compassPoint) {
-        float bearing;
-        switch (compassPoint.getType()) {
-            case "direction":
-                bearing = compassPoint.getBearing();
-                break;
-            case "coordinate":
-                double dX = compassPoint.getXCoordinate() - player.getLocation().getX();
-                double dZ = player.getLocation().getZ() - compassPoint.getZCoordinate();
-                final float fromRadiansToDegrees = 57.2957795131F;
-                bearing = (float) (Math.atan2(dX, dZ) * fromRadiansToDegrees);
-                break;
-            default:
-                throw new RuntimeException("Unknown Compass Type");
-        }
-        return bearing;
+    //Placing of compass point on compass
+    private void insertCompassPoint(int placement, String compassPointName) {
+        compass.replace(placement, placement + compassPointName.length(), compassPointName);
+    }
+
+    //Adding colour and index of compass point onto map.
+    private void insertCompassPointColour(CompassPoint compassPoint, int index, String compassPointName) {
+        insertColourInMap(index, compassPoint.getColour());
+        insertColourInMap(index + compassPointName.length(), compassBaseColour);
     }
 
     private void addAllColoursToCompass() {
@@ -173,6 +177,7 @@ public class Compass {
             compass.insert(entry.getKey(), entry.getValue());
         }
     }
+
 
     private float polynomialFunction(float x, float[] coefficients) {
         float xTermValue = 1;
@@ -186,5 +191,9 @@ public class Compass {
 
     private float modulus(float a, float b) {
         return (float) (a - (Math.floor(a/b) * b));
+    }
+
+    private void test(Entity entity) {
+        entity.setGlowing(true);
     }
 }
